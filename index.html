@@ -26,12 +26,11 @@
       justify-content: center;
       overflow-x: hidden;
       padding: 16px;
-      touch-action: none; /* 드래그 중 스크롤 방지 */
     }
 
     #game-container {
       width: 100%;
-      max-width: 640px;
+      max-width: 600px;
       background: #FFFFFF;
       border-radius: 36px;
       padding: 24px 20px;
@@ -40,44 +39,112 @@
       position: relative;
       display: flex;
       flex-direction: column;
-      min-height: 580px;
+      min-height: 520px;
       justify-content: space-between;
     }
 
+    /* 상단 헤더 */
     .header {
-      margin-bottom: 10px;
+      margin-bottom: 12px;
     }
 
     .title {
       font-size: 2.2rem;
       color: #FF6B6B;
       text-shadow: 2px 2px 0px #FFE066;
+      letter-spacing: 1px;
     }
 
     .sub-title {
-      font-size: 1.15rem;
+      font-size: 1.1rem;
       color: #4D96FF;
       margin-top: 4px;
     }
 
-    /* 모드 전환 버튼 */
+    /* 퀴즈 영역 */
+    .quiz-card {
+      background: #F8F9FA;
+      border: 4px dashed #FFD166;
+      border-radius: 28px;
+      padding: 20px 10px;
+      margin: 14px 0;
+      transition: all 0.3s ease;
+    }
+
+    .avatar-icon {
+      font-size: 4.8rem;
+      display: inline-block;
+      filter: drop-shadow(0 6px 8px rgba(0,0,0,0.1));
+      animation: float 2.4s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-8px) rotate(3deg); }
+    }
+
+    .prompt-label {
+      font-size: 1.25rem;
+      color: #6C757D;
+      margin-top: 6px;
+    }
+
+    .target-word {
+      font-size: 2.6rem;
+      color: #333333;
+      margin-top: 4px;
+      font-weight: bold;
+    }
+
+    /* 보기 버튼 목록 */
+    .options-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-top: 10px;
+    }
+
+    .option-btn {
+      background: #FFFFFF;
+      border: 4px solid #6BCB77;
+      border-radius: 24px;
+      padding: 16px 8px;
+      font-family: 'Jua', sans-serif;
+      font-size: 2rem;
+      color: #2D3748;
+      cursor: pointer;
+      box-shadow: 0 6px 0 #4EA85A;
+      transition: transform 0.1s, box-shadow 0.1s;
+      outline: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .option-btn:hover {
+      background: #F0FFF4;
+    }
+
+    .option-btn:active {
+      transform: translateY(4px);
+      box-shadow: 0 2px 0 #4EA85A;
+    }
+
+    /* 모드 전환 탭 버튼 */
     .mode-switch {
       display: flex;
       justify-content: center;
       gap: 10px;
-      margin: 8px 0;
+      margin-bottom: 8px;
     }
 
     .mode-tab {
       background: #EDF2F7;
       border: none;
-      padding: 8px 16px;
+      padding: 8px 14px;
       border-radius: 20px;
       font-family: 'Jua', sans-serif;
-      font-size: 1rem;
+      font-size: 0.95rem;
       color: #718096;
       cursor: pointer;
-      transition: all 0.2s;
     }
 
     .mode-tab.active {
@@ -86,67 +153,12 @@
       box-shadow: 0 4px 10px rgba(255, 107, 107, 0.4);
     }
 
-    /* 드롭 대상 타겟 박스 (위쪽) */
-    .drop-target-area {
-      background: #F8F9FA;
-      border: 4px dashed #FFD166;
-      border-radius: 28px;
-      padding: 18px 16px;
-      margin: 12px 0;
-      position: relative;
-      transition: all 0.3s ease;
-    }
-
-    .drop-target-area.drag-over {
-      background: #FFF3CD;
-      border-color: #FF9F1C;
-      transform: scale(1.02);
-    }
-
-    .avatar-icon {
-      font-size: 4.8rem;
-      display: inline-block;
-      animation: float 2.4s ease-in-out infinite;
-    }
-
-    @keyframes float {
-      0%, 100% { transform: translateY(0px); }
-      50% { transform: translateY(-8px); }
-    }
-
-    .target-guide {
-      font-size: 1.25rem;
-      color: #4A5568;
-      margin-top: 6px;
-    }
-
-    .target-box {
-      min-height: 72px;
-      margin-top: 10px;
-      border: 3px dashed #CBD5E0;
-      border-radius: 20px;
-      background: #FFFFFF;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 2.2rem;
-      color: #A0AEC0;
-      padding: 8px;
-      transition: all 0.2s;
-    }
-
-    .target-box.has-dropped {
-      border-color: #48BB78;
-      color: #2F855A;
-      background: #F0FFF4;
-    }
-
-    /* 목소리 다시 듣기 버튼 */
+    /* 다시 듣기 버튼 */
     .tts-btn {
       background: #FFD166;
       border: none;
       border-radius: 20px;
-      padding: 6px 16px;
+      padding: 6px 14px;
       font-family: 'Jua', sans-serif;
       font-size: 1.05rem;
       color: #5D4037;
@@ -163,50 +175,14 @@
       box-shadow: 0 2px 0 #E5B339;
     }
 
-    /* 드래그할 글자 블록들 (아래쪽) */
-    .drag-items-area {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 14px;
-      margin-top: 14px;
-      min-height: 80px;
-    }
-
-    .drag-block {
-      background: #FFFFFF;
-      border: 4px solid #4D96FF;
-      border-radius: 24px;
-      padding: 14px 22px;
-      font-family: 'Jua', sans-serif;
-      font-size: 2rem;
-      color: #2B6CB0;
-      cursor: grab;
-      box-shadow: 0 6px 0 #2B6CB0;
-      transition: transform 0.1s, box-shadow 0.1s;
-      touch-action: none;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 5;
-    }
-
-    .drag-block:active, .drag-block.dragging {
-      cursor: grabbing;
-      opacity: 0.9;
-      transform: scale(1.1);
-      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.25);
-      z-index: 999;
-    }
-
-    /* 별점 */
+    /* 별점 / 진행도 */
     .score-container {
-      margin-top: 14px;
-      font-size: 1.4rem;
+      margin-top: 10px;
+      font-size: 1.3rem;
       color: #FFB703;
     }
 
-    /* 정답 축하 오버레이 */
+    /* 축하 효과 애니메이션 오버레이 */
     .celebration-overlay {
       position: absolute;
       top: 0;
@@ -214,12 +190,12 @@
       width: 100%;
       height: 100%;
       border-radius: 36px;
-      background: rgba(255, 255, 255, 0.94);
+      background: rgba(255, 255, 255, 0.92);
       display: none;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      z-index: 20;
+      z-index: 10;
       animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
 
@@ -229,7 +205,7 @@
     }
 
     .celebration-emoji {
-      font-size: 5.5rem;
+      font-size: 5rem;
       animation: heartBeat 0.7s infinite alternate;
     }
 
@@ -239,19 +215,28 @@
     }
 
     .celebration-text {
-      font-size: 2.3rem;
+      font-size: 2.2rem;
       color: #FF4D6D;
-      margin-top: 14px;
+      margin-top: 12px;
     }
 
-    .shake-anim {
+    .correct-flash {
+      animation: flashSuccess 0.5s ease;
+    }
+
+    .wrong-flash {
       animation: shakeFail 0.4s ease;
+    }
+
+    @keyframes flashSuccess {
+      0% { background: #C6F6D5; }
+      100% { background: #FFFFFF; }
     }
 
     @keyframes shakeFail {
       0%, 100% { transform: translateX(0); }
-      20%, 60% { transform: translateX(-12px); }
-      40%, 80% { transform: translateX(12px); }
+      20%, 60% { transform: translateX(-10px); }
+      40%, 80% { transform: translateX(10px); }
     }
   </style>
 </head>
@@ -261,34 +246,36 @@
     <!-- 헤더 -->
     <div class="header">
       <h1 class="title">✨ 윤슬의 한글게임 ✨</h1>
-      <div class="sub-title">글자를 끌어서 상자에 쏙! 넣어보세요</div>
+      <div class="sub-title">우리가족 이름을 맞춰봐요!</div>
     </div>
 
-    <!-- 모드 선택 -->
+    <!-- 모드 선택 탭 -->
     <div class="mode-switch">
-      <button class="mode-tab active" id="tab-family-name" onclick="changeMode('familyToName')">호칭 ➔ 이름 쏙!</button>
-      <button class="mode-tab" id="tab-name-family" onclick="changeMode('nameToFamily')">이름 ➔ 호칭 쏙!</button>
+      <button class="mode-tab active" id="tab-mode-name" onclick="changeMode('familyToName')">호칭 ➔ 이름 맞추기</button>
+      <button class="mode-tab" id="tab-mode-family" onclick="changeMode('nameToFamily')">이름 ➔ 호칭 맞추기</button>
+      <button class="mode-tab" id="tab-mode-word" onclick="changeMode('wordMatch')">같은 글자 짝꿍</button>
     </div>
 
-    <!-- 맞추는 영역 (드롭 타겟) -->
-    <div class="drop-target-area" id="dropArea">
+    <!-- 문제 카드 -->
+    <div class="quiz-card" id="quizCard">
       <div class="avatar-icon" id="questionIcon">👩</div>
-      <div class="target-guide" id="questionGuide">엄마의 이름을 끌어다 놓아보세요!</div>
-      <div class="target-box" id="targetBox">여기에 글자를 쏙! 놓아주세요</div>
+      <div class="prompt-label" id="questionPrompt">엄마의 이름은 무엇일까요?</div>
+      <div class="target-word" id="questionWord">엄마</div>
+      <br>
       <button class="tts-btn" onclick="speakCurrentQuestion()">🔊 목소리로 듣기</button>
     </div>
 
-    <!-- 드래그할 글자 목록 -->
-    <div class="drag-items-area" id="dragArea">
+    <!-- 보기 버튼 (4개 or 3개) -->
+    <div class="options-grid" id="optionsGrid">
       <!-- 동적 생성 -->
     </div>
 
-    <!-- 별점 -->
+    <!-- 점수 / 진행 -->
     <div class="score-container" id="starDisplay">
       ⭐ 별 모으기: 0개
     </div>
 
-    <!-- 정답 축하 팝업 -->
+    <!-- 정답 오버레이 -->
     <div class="celebration-overlay" id="celebrationOverlay">
       <div class="celebration-emoji" id="celebrationEmoji">🎉</div>
       <div class="celebration-text" id="celebrationText">참 잘했어요!</div>
@@ -296,19 +283,20 @@
   </div>
 
   <script>
+    // 가족 데이터 (윤슬이는 5살 남아 캐릭터 👦🏻/🧒)
     const familyData = [
       { role: '엄마', name: '남호정', icon: '👩' },
       { role: '아빠', name: '윤태환', icon: '👨' },
       { role: '형아', name: '윤호',   icon: '👦' },
-      { role: '윤슬', name: '윤슬',   icon: '👧' }
+      { role: '윤슬', name: '윤슬',   icon: '🧒' }
     ];
 
-    let currentMode = 'familyToName'; // 'familyToName' | 'nameToFamily'
+    let currentMode = 'familyToName'; // 'familyToName' | 'nameToFamily' | 'wordMatch'
     let currentQuestion = null;
     let starsCount = 0;
     let isProcessing = false;
 
-    // Web Audio 사운드 효과
+    // Web Audio API 효과음
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
     function playSound(type) {
@@ -322,8 +310,8 @@
           const g = audioCtx.createGain();
           o.type = 'triangle';
           o.frequency.setValueAtTime(freq, audioCtx.currentTime + idx * 0.1);
-          g.gain.setValueAtTime(0.35, audioCtx.currentTime + idx * 0.1);
-          g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + idx * 0.1 + 0.28);
+          g.gain.setValueAtTime(0.3, audioCtx.currentTime + idx * 0.1);
+          g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + idx * 0.1 + 0.25);
           o.connect(g);
           g.connect(audioCtx.destination);
           o.start(audioCtx.currentTime + idx * 0.1);
@@ -336,30 +324,31 @@
         gain.connect(audioCtx.destination);
         osc.type = 'sawtooth';
         osc.frequency.setValueAtTime(220, audioCtx.currentTime);
-        osc.frequency.linearRampToValueAtTime(140, audioCtx.currentTime + 0.25);
-        gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+        osc.frequency.linearRampToValueAtTime(150, audioCtx.currentTime + 0.25);
+        gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
         gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.25);
         osc.start(audioCtx.currentTime);
         osc.stop(audioCtx.currentTime + 0.25);
       }
     }
 
-    // TTS 음성
+    // TTS 목소리 말하기
     function speakText(text) {
       if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
         const utterance = new SpeechSynthesisUtterance(text);
         utterance.lang = 'ko-KR';
-        utterance.rate = 0.85;
-        utterance.pitch = 1.25;
+        utterance.rate = 0.85; // 5세 아이 눈높이에 맞춰 천천히 또박또박
+        utterance.pitch = 1.2;
         window.speechSynthesis.speak(utterance);
       }
     }
 
     function changeMode(mode) {
       currentMode = mode;
-      document.getElementById('tab-family-name').classList.toggle('active', mode === 'familyToName');
-      document.getElementById('tab-name-family').classList.toggle('active', mode === 'nameToFamily');
+      document.getElementById('tab-mode-name').classList.toggle('active', mode === 'familyToName');
+      document.getElementById('tab-mode-family').classList.toggle('active', mode === 'nameToFamily');
+      document.getElementById('tab-mode-word').classList.toggle('active', mode === 'wordMatch');
       nextRound();
     }
 
@@ -367,11 +356,6 @@
       isProcessing = false;
       document.getElementById('celebrationOverlay').style.display = 'none';
 
-      const targetBox = document.getElementById('targetBox');
-      targetBox.innerText = '여기에 글자를 쏙! 놓아주세요';
-      targetBox.classList.remove('has-dropped');
-
-      // 무작위 문제 선택
       const targetItem = familyData[Math.floor(Math.random() * familyData.length)];
       currentQuestion = {
         target: targetItem,
@@ -379,41 +363,57 @@
       };
 
       const iconEl = document.getElementById('questionIcon');
-      const guideEl = document.getElementById('questionGuide');
-      const dragArea = document.getElementById('dragArea');
-      dragArea.innerHTML = '';
+      const promptEl = document.getElementById('questionPrompt');
+      const wordEl = document.getElementById('questionWord');
+      const optionsGrid = document.getElementById('optionsGrid');
+      optionsGrid.innerHTML = '';
 
       iconEl.innerText = targetItem.icon;
 
-      let promptVoice = '';
       let answerText = '';
+      let promptVoice = '';
 
       if (currentMode === 'familyToName') {
-        guideEl.innerText = `[${targetItem.role}]의 이름을 상자에 끌어다 놓아보세요!`;
+        promptEl.innerText = `${targetItem.role}의 이름은 무엇일까요?`;
+        wordEl.innerText = targetItem.role;
         answerText = targetItem.name;
-        promptVoice = `${targetItem.role}! ${targetItem.role}의 이름을 끌어서 넣어보세요!`;
-      } else {
-        guideEl.innerText = `[${targetItem.name}]은(는) 누구일까요? 상자에 쏙!`;
+        promptVoice = `${targetItem.role}! ${targetItem.role}의 이름은 무엇일까요?`;
+      } else if (currentMode === 'nameToFamily') {
+        promptEl.innerText = `${targetItem.name}은(는) 누구일까요?`;
+        wordEl.innerText = targetItem.name;
         answerText = targetItem.role;
-        promptVoice = `${targetItem.name}! ${targetItem.name}은 누구일까요? 끌어서 넣어보세요!`;
+        promptVoice = `${targetItem.name}! 누구일까요?`;
+      } else if (currentMode === 'wordMatch') {
+        promptEl.innerText = `똑같은 글자를 찾아보세요!`;
+        wordEl.innerText = targetItem.name;
+        answerText = targetItem.name;
+        promptVoice = `${targetItem.name}! 똑같은 글자를 찾아보세요!`;
       }
 
       currentQuestion.correctAnswer = answerText;
       currentQuestion.voiceText = promptVoice;
 
-      // 보기 생성 (4개 가족 모두 제시하거나 3개)
-      let choices = [];
-      if (currentMode === 'familyToName') {
-        choices = familyData.map(d => d.name);
+      let candidatePool = [];
+      if (currentMode === 'familyToName' || currentMode === 'wordMatch') {
+        candidatePool = familyData.map(d => d.name);
       } else {
-        choices = familyData.map(d => d.role);
+        candidatePool = familyData.map(d => d.role);
       }
-      shuffleArray(choices);
 
-      // 드래그 가능한 블록 생성 (마우스 + 터치 포인터 이벤트 모두 지원)
-      choices.forEach(text => {
-        const block = createDraggableBlock(text);
-        dragArea.appendChild(block);
+      const incorrectChoices = candidatePool.filter(c => c !== answerText);
+      shuffleArray(incorrectChoices);
+      const options = [answerText, incorrectChoices[0], incorrectChoices[1]];
+      if (incorrectChoices[2]) {
+        options.push(incorrectChoices[2]);
+      }
+      shuffleArray(options);
+
+      options.forEach(optText => {
+        const btn = document.createElement('button');
+        btn.className = 'option-btn';
+        btn.innerText = optText;
+        btn.onclick = () => handleChoice(optText, btn);
+        optionsGrid.appendChild(btn);
       });
 
       speakText(promptVoice);
@@ -425,122 +425,30 @@
       }
     }
 
-    // 마우스 및 모바일/태블릿 터치 드래그 앤 드롭 구현
-    function createDraggableBlock(text) {
-      const block = document.createElement('div');
-      block.className = 'drag-block';
-      block.innerText = text;
-      block.dataset.value = text;
-
-      let startX = 0, startY = 0;
-      let initialLeft = 0, initialTop = 0;
-      let isDragging = false;
-
-      // PointerDown (마우스 클릭 또는 손가락 터치)
-      block.onpointerdown = (e) => {
-        if (isProcessing) return;
-        isDragging = true;
-        block.setPointerCapture(e.pointerId);
-
-        // 클릭시 해당 글자 읽어주기
-        speakText(text);
-
-        startX = e.clientX;
-        startY = e.clientY;
-
-        block.classList.add('dragging');
-        block.style.position = 'relative';
-        block.style.zIndex = 1000;
-      };
-
-      // PointerMove
-      block.onpointermove = (e) => {
-        if (!isDragging) return;
-        const dx = e.clientX - startX;
-        const dy = e.clientY - startY;
-        block.style.transform = `translate(${dx}px, ${dy}px) scale(1.12)`;
-
-        // 타겟 박스 위에 있는지 체크
-        const targetBox = document.getElementById('targetBox');
-        const boxRect = targetBox.getBoundingClientRect();
-        if (
-          e.clientX >= boxRect.left &&
-          e.clientX <= boxRect.right &&
-          e.clientY >= boxRect.top &&
-          e.clientY <= boxRect.bottom
-        ) {
-          document.getElementById('dropArea').classList.add('drag-over');
-        } else {
-          document.getElementById('dropArea').classList.remove('drag-over');
-        }
-      };
-
-      // PointerUp
-      block.onpointerup = (e) => {
-        if (!isDragging) return;
-        isDragging = false;
-        block.releasePointerCapture(e.pointerId);
-        block.classList.remove('dragging');
-        document.getElementById('dropArea').classList.remove('drag-over');
-
-        const targetBox = document.getElementById('targetBox');
-        const boxRect = targetBox.getBoundingClientRect();
-
-        // 타겟 박스 안에 놓였는지 판정
-        const droppedInTarget = (
-          e.clientX >= boxRect.left - 20 &&
-          e.clientX <= boxRect.right + 20 &&
-          e.clientY >= boxRect.top - 20 &&
-          e.clientY <= boxRect.bottom + 20
-        );
-
-        if (droppedInTarget) {
-          checkAnswer(text, block);
-        } else {
-          // 원래 위치로 원복
-          block.style.transition = 'transform 0.2s ease';
-          block.style.transform = 'translate(0px, 0px)';
-          setTimeout(() => {
-            block.style.transition = '';
-            block.style.position = '';
-            block.style.zIndex = '';
-          }, 200);
-        }
-      };
-
-      block.onpointercancel = () => {
-        isDragging = false;
-        block.classList.remove('dragging');
-        block.style.transform = 'translate(0px, 0px)';
-      };
-
-      return block;
-    }
-
-    function checkAnswer(selectedText, blockEl) {
-      const targetBox = document.getElementById('targetBox');
+    function handleChoice(selectedText, btnEl) {
+      if (isProcessing) return;
 
       if (selectedText === currentQuestion.correctAnswer) {
-        // 정답!
+        // 정답
         isProcessing = true;
         playSound('correct');
         starsCount++;
         updateStars();
 
-        targetBox.innerText = `✨ ${selectedText} ✨`;
-        targetBox.classList.add('has-dropped');
-        blockEl.style.visibility = 'hidden';
+        btnEl.style.background = '#C6F6D5';
+        btnEl.style.borderColor = '#38A169';
 
         const praises = [
           '정답이에요! 참 잘했어요!',
-          '우와! 윤슬이 대단해요!',
-          '쏙 들어갔네요! 최고예요!',
+          '우와! 우리 윤슬이 최고!',
+          '맞았어요! 멋쟁이 윤슬이!',
           '딩동댕! 아주 잘했어요!'
         ];
         const celebrationVoice = praises[Math.floor(Math.random() * praises.length)];
         const emojis = ['🌟', '💖', '🎉', '👏', '🥳', '🎈'];
+        const chosenEmoji = emojis[Math.floor(Math.random() * emojis.length)];
 
-        document.getElementById('celebrationEmoji').innerText = emojis[Math.floor(Math.random() * emojis.length)];
+        document.getElementById('celebrationEmoji').innerText = chosenEmoji;
         document.getElementById('celebrationText').innerText = celebrationVoice;
         document.getElementById('celebrationOverlay').style.display = 'flex';
 
@@ -552,20 +460,17 @@
       } else {
         // 오답
         playSound('wrong');
-        const dropArea = document.getElementById('dropArea');
-        dropArea.classList.add('shake-anim');
+        btnEl.classList.add('wrong-flash');
+        btnEl.style.background = '#FED7D7';
+        btnEl.style.borderColor = '#E53E3E';
 
-        // 원래 위치로 복귀
-        blockEl.style.transition = 'transform 0.25s ease';
-        blockEl.style.transform = 'translate(0px, 0px)';
+        speakText(`괜찮아요, 다시 한번 찾아볼까요?`);
+
         setTimeout(() => {
-          blockEl.style.transition = '';
-          blockEl.style.position = '';
-          blockEl.style.zIndex = '';
-          dropArea.classList.remove('shake-anim');
-        }, 400);
-
-        speakText(`어라? 다시 다른 글자를 끌어와 볼까요?`);
+          btnEl.classList.remove('wrong-flash');
+          btnEl.style.background = '#FFFFFF';
+          btnEl.style.borderColor = '#6BCB77';
+        }, 600);
       }
     }
 
