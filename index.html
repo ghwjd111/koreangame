@@ -30,7 +30,7 @@
 
     #game-container {
       width: 100%;
-      max-width: 640px;
+      max-width: 720px;
       background: #FFFFFF;
       border-radius: 36px;
       padding: 22px 18px;
@@ -102,20 +102,21 @@
     .trace-canvas-container {
       position: relative;
       width: 100%;
-      max-width: 520px;
-      height: 240px;
+      max-width: 680px;
+      height: 320px;
       margin: 12px auto;
       background: #FFFFFF;
       border: 4px solid #48BB78;
-      border-radius: 24px;
-      box-shadow: inset 0 4px 8px rgba(0,0,0,0.06);
+      border-radius: 28px;
+      box-shadow: inset 0 4px 10px rgba(0,0,0,0.06);
       touch-action: none; /* 터치 스크롤 방지 */
       display: flex;
       align-items: center;
       justify-content: center;
+      overflow: hidden;
     }
 
-    /* 흐릿하게 보이는 가이드 글씨 */
+    /* 흐릿하게 보이는 가이드 글씨: 2배 크기로 확대! */
     .trace-guide-text {
       position: absolute;
       top: 0;
@@ -125,14 +126,15 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 5.5rem;
-      font-weight: bold;
-      color: rgba(160, 174, 192, 0.35); /* 흐린 회색 */
-      letter-spacing: 12px;
+      font-size: 10rem; /* 기존 5.5rem에서 2배 가까이 확대 */
+      font-weight: 900;
+      color: rgba(160, 174, 192, 0.4); /* 연한 회색 가이드 */
+      letter-spacing: 16px;
       pointer-events: none;
       user-select: none;
       font-family: 'Jua', sans-serif;
-      text-shadow: 0 0 2px rgba(0,0,0,0.1);
+      text-shadow: 0 0 4px rgba(0,0,0,0.08);
+      white-space: nowrap;
     }
 
     .trace-canvas {
@@ -515,7 +517,7 @@
         <!-- 캔버스 및 흐린 글자 영역 -->
         <div class="trace-canvas-container" id="traceContainer">
           <div class="trace-guide-text" id="traceGuideText">남호정</div>
-          <canvas id="traceCanvas" class="trace-canvas" width="500" height="230"></canvas>
+          <canvas id="traceCanvas" class="trace-canvas" width="660" height="310"></canvas>
         </div>
 
         <!-- 크레파스 색상 & 조작 도구 -->
@@ -983,7 +985,7 @@
       traceCtx.beginPath();
       traceCtx.moveTo(x, y);
       traceCtx.strokeStyle = currentPenColor;
-      traceCtx.lineWidth = 14;
+      traceCtx.lineWidth = 22; // 글자가 2배 커진 만큼 펜도 굵직한 크레파스 느낌으로!
       traceCtx.lineCap = 'round';
       traceCtx.lineJoin = 'round';
 
