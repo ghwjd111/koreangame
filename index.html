@@ -103,7 +103,7 @@
       position: relative;
       width: 100%;
       max-width: 680px;
-      height: 320px;
+      height: 250px;
       margin: 12px auto;
       background: #FFFFFF;
       border: 4px solid #48BB78;
@@ -114,9 +114,10 @@
       align-items: center;
       justify-content: center;
       overflow: hidden;
+      padding: 0 10px;
     }
 
-    /* 흐릿하게 보이는 가이드 글씨: 2배 크기로 확대! */
+    /* 흐릿하게 보이는 가이드 글씨: 핸드폰에서도 경계를 벗어나지 않는 반응형 크기! */
     .trace-guide-text {
       position: absolute;
       top: 0;
@@ -126,15 +127,16 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 10rem; /* 기존 5.5rem에서 2배 가까이 확대 */
+      font-size: clamp(3.2rem, 16vw, 6.8rem); /* 모바일 화면 폭에 맞춰 쏙 들어감 */
       font-weight: 900;
       color: rgba(160, 174, 192, 0.4); /* 연한 회색 가이드 */
-      letter-spacing: 16px;
+      letter-spacing: clamp(4px, 2vw, 14px);
       pointer-events: none;
       user-select: none;
       font-family: 'Jua', sans-serif;
-      text-shadow: 0 0 4px rgba(0,0,0,0.08);
+      text-shadow: 0 0 3px rgba(0,0,0,0.08);
       white-space: nowrap;
+      text-align: center;
     }
 
     .trace-canvas {
@@ -949,16 +951,20 @@
     let currentPenColor = '#E53E3E'; // 기본 빨강
 
     function initTraceCanvas() {
-      if (!traceCanvas) {
-        traceCanvas = document.getElementById('traceCanvas');
-        traceCtx = traceCanvas.getContext('2d');
+      traceCanvas = document.getElementById('traceCanvas');
+      traceCtx = traceCanvas.getContext('2d');
 
-        // 터치 및 마우스 드로잉 이벤트 등록
-        traceCanvas.addEventListener('pointerdown', startDraw);
-        traceCanvas.addEventListener('pointermove', drawMove);
-        traceCanvas.addEventListener('pointerup', endDraw);
-        traceCanvas.addEventListener('pointercancel', endDraw);
+      const container = document.getElementById('traceContainer');
+      if (container) {
+        traceCanvas.width = container.clientWidth || 500;
+        traceCanvas.height = container.clientHeight || 250;
       }
+
+      // 이벤트 중복 방지 후 재등록
+      traceCanvas.onpointerdown = startDraw;
+      traceCanvas.onpointermove = drawMove;
+      traceCanvas.onpointerup = endDraw;
+      traceCanvas.onpointercancel = endDraw;
     }
 
     function setPenColor(color, el) {
@@ -985,7 +991,7 @@
       traceCtx.beginPath();
       traceCtx.moveTo(x, y);
       traceCtx.strokeStyle = currentPenColor;
-      traceCtx.lineWidth = 22; // 글자가 2배 커진 만큼 펜도 굵직한 크레파스 느낌으로!
+      traceCtx.lineWidth = 11; // 굵기를 반으로 얇게 조정 (기존 22 -> 11)
       traceCtx.lineCap = 'round';
       traceCtx.lineJoin = 'round';
 
