@@ -57,23 +57,25 @@
       margin-top: 4px;
     }
 
-    /* 최상단 대메뉴: 게임 1 vs 게임 2 선택 버튼 */
+    /* 최상단 대메뉴: 3가지 게임 선택 버튼 */
     .main-game-nav {
       display: flex;
       justify-content: center;
-      gap: 12px;
-      margin: 14px 0 8px 0;
+      gap: 8px;
+      margin: 12px 0 8px 0;
+      flex-wrap: wrap;
     }
 
     .nav-btn {
       flex: 1;
-      max-width: 250px;
+      min-width: 140px;
+      max-width: 190px;
       background: #EDF2F7;
       border: 3px solid #CBD5E0;
-      padding: 12px 10px;
-      border-radius: 22px;
+      padding: 10px 6px;
+      border-radius: 20px;
       font-family: 'Jua', sans-serif;
-      font-size: 1.15rem;
+      font-size: 1.05rem;
       color: #4A5568;
       cursor: pointer;
       box-shadow: 0 4px 0 #CBD5E0;
@@ -86,6 +88,108 @@
       color: #FFFFFF;
       box-shadow: 0 5px 0 #C53030;
       transform: translateY(-2px);
+    }
+
+    /* =================== 게임 3: 쓱싹 따라쓰기 =================== */
+    .game3-card {
+      background: #F0FFF4;
+      border: 4px dashed #68D391;
+      border-radius: 28px;
+      padding: 14px 10px;
+      margin-bottom: 10px;
+    }
+
+    .trace-canvas-container {
+      position: relative;
+      width: 100%;
+      max-width: 520px;
+      height: 240px;
+      margin: 12px auto;
+      background: #FFFFFF;
+      border: 4px solid #48BB78;
+      border-radius: 24px;
+      box-shadow: inset 0 4px 8px rgba(0,0,0,0.06);
+      touch-action: none; /* 터치 스크롤 방지 */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* 흐릿하게 보이는 가이드 글씨 */
+    .trace-guide-text {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 5.5rem;
+      font-weight: bold;
+      color: rgba(160, 174, 192, 0.35); /* 흐린 회색 */
+      letter-spacing: 12px;
+      pointer-events: none;
+      user-select: none;
+      font-family: 'Jua', sans-serif;
+      text-shadow: 0 0 2px rgba(0,0,0,0.1);
+    }
+
+    .trace-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border-radius: 20px;
+      cursor: crosshair;
+      touch-action: none;
+      z-index: 5;
+    }
+
+    /* 따라쓰기 도구 모음 */
+    .trace-tools {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+      margin-top: 8px;
+      flex-wrap: wrap;
+    }
+
+    .color-dot {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 3px solid #FFFFFF;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+      transition: transform 0.15s;
+    }
+
+    .color-dot.active {
+      transform: scale(1.25);
+      border-color: #2D3748;
+    }
+
+    .trace-action-btn {
+      background: #EDF2F7;
+      border: 2px solid #CBD5E0;
+      border-radius: 18px;
+      padding: 8px 14px;
+      font-family: 'Jua', sans-serif;
+      font-size: 1rem;
+      color: #4A5568;
+      cursor: pointer;
+      box-shadow: 0 3px 0 #CBD5E0;
+    }
+
+    .trace-action-btn.finish {
+      background: #48BB78;
+      border-color: #38A169;
+      color: white;
+      box-shadow: 0 3px 0 #2F855A;
+      font-size: 1.1rem;
     }
 
     /* =================== 게임 1: 콕콕 선택 퀴즈 =================== */
@@ -346,13 +450,16 @@
       <div class="sub-title" id="subTitleText">우리가족 이름을 맞춰봐요!</div>
     </div>
 
-    <!-- 🎮 두 게임 간 전환 탭 버튼 -->
+    <!-- 🎮 세 게임 간 전환 탭 버튼 -->
     <div class="main-game-nav">
       <button class="nav-btn active" id="btn-main-game1" onclick="switchMainGame('click')">
-        👉 콕콕 누르기 게임
+        👉 콕콕 누르기
       </button>
       <button class="nav-btn" id="btn-main-game2" onclick="switchMainGame('puzzle')">
-        🧩 글자 모아 완성하기
+        🧩 글자 모으기
+      </button>
+      <button class="nav-btn" id="btn-main-game3" onclick="switchMainGame('trace')">
+        ✍️ 글씨 따라쓰기
       </button>
     </div>
 
@@ -396,6 +503,31 @@
       <div style="font-size: 1.05rem; color: #718096; margin-bottom: 4px;">👇 글자를 꾹 끌어서 위 상자에 쏙! 넣어보세요 (클릭도 가능해요)</div>
       <div class="letters-basket" id="g2-basket">
         <!-- 동적 생성 (예: 남, 윤, 정, 호, 슬, 태 등) -->
+      </div>
+    </div>
+
+    <!-- ======================= 3. 글씨 따라쓰기 게임 뷰 ======================= -->
+    <div id="view-game3" style="display: none;">
+      <div class="game3-card">
+        <div class="avatar-icon" id="g3-icon">👩</div>
+        <div class="prompt-label" id="g3-prompt">엄마 이름은 무엇일까요? 글씨를 따라 써봐요!</div>
+        
+        <!-- 캔버스 및 흐린 글자 영역 -->
+        <div class="trace-canvas-container" id="traceContainer">
+          <div class="trace-guide-text" id="traceGuideText">남호정</div>
+          <canvas id="traceCanvas" class="trace-canvas" width="500" height="230"></canvas>
+        </div>
+
+        <!-- 크레파스 색상 & 조작 도구 -->
+        <div class="trace-tools">
+          <div class="color-dot active" style="background: #E53E3E;" onclick="setPenColor('#E53E3E', this)"></div>
+          <div class="color-dot" style="background: #3182CE;" onclick="setPenColor('#3182CE', this)"></div>
+          <div class="color-dot" style="background: #38A169;" onclick="setPenColor('#38A169', this)"></div>
+          <div class="color-dot" style="background: #D69E2E;" onclick="setPenColor('#D69E2E', this)"></div>
+          <div class="color-dot" style="background: #805AD5;" onclick="setPenColor('#805AD5', this)"></div>
+          <button class="trace-action-btn" onclick="clearTraceCanvas()">🧹 다시 쓰기</button>
+          <button class="trace-action-btn finish" onclick="finishTracing()">✨ 다 썼어요!</button>
+        </div>
       </div>
     </div>
 
@@ -502,21 +634,31 @@
       currentMainGame = gameType;
       document.getElementById('btn-main-game1').classList.toggle('active', gameType === 'click');
       document.getElementById('btn-main-game2').classList.toggle('active', gameType === 'puzzle');
+      document.getElementById('btn-main-game3').classList.toggle('active', gameType === 'trace');
 
       const v1 = document.getElementById('view-game1');
       const v2 = document.getElementById('view-game2');
+      const v3 = document.getElementById('view-game3');
       const subTitle = document.getElementById('subTitleText');
 
       if (gameType === 'click') {
         v1.style.display = 'block';
         v2.style.display = 'none';
+        v3.style.display = 'none';
         subTitle.innerText = '우리가족 이름을 버튼으로 콕콕 맞춰봐요!';
         nextRoundGame1();
-      } else {
+      } else if (gameType === 'puzzle') {
         v1.style.display = 'none';
         v2.style.display = 'block';
+        v3.style.display = 'none';
         subTitle.innerText = '섞여있는 글자를 순서대로 끌어와서 이름을 완성해요!';
         nextRoundGame2();
+      } else if (gameType === 'trace') {
+        v1.style.display = 'none';
+        v2.style.display = 'none';
+        v3.style.display = 'block';
+        subTitle.innerText = '흐린 글씨를 예쁘게 쓱싹쓱싹 따라 써봐요!';
+        nextRoundGame3();
       }
     }
 
@@ -794,6 +936,113 @@
 
         speakText('어라? 그 글자가 아닌 것 같아요. 다시 한번 찾아볼까요?');
       }
+    }
+
+    /* =================== 게임 3: 쓱싹 따라쓰기 로직 =================== */
+    let traceTurnIndex = 0;
+    let traceTarget = null;
+    let traceCanvas = null;
+    let traceCtx = null;
+    let isDrawing = false;
+    let currentPenColor = '#E53E3E'; // 기본 빨강
+
+    function initTraceCanvas() {
+      if (!traceCanvas) {
+        traceCanvas = document.getElementById('traceCanvas');
+        traceCtx = traceCanvas.getContext('2d');
+
+        // 터치 및 마우스 드로잉 이벤트 등록
+        traceCanvas.addEventListener('pointerdown', startDraw);
+        traceCanvas.addEventListener('pointermove', drawMove);
+        traceCanvas.addEventListener('pointerup', endDraw);
+        traceCanvas.addEventListener('pointercancel', endDraw);
+      }
+    }
+
+    function setPenColor(color, el) {
+      currentPenColor = color;
+      document.querySelectorAll('.color-dot').forEach(dot => dot.classList.remove('active'));
+      if (el) el.classList.add('active');
+    }
+
+    function clearTraceCanvas() {
+      if (traceCtx && traceCanvas) {
+        traceCtx.clearRect(0, 0, traceCanvas.width, traceCanvas.height);
+      }
+    }
+
+    function startDraw(e) {
+      if (isProcessing) return;
+      isDrawing = true;
+      traceCanvas.setPointerCapture(e.pointerId);
+
+      const rect = traceCanvas.getBoundingClientRect();
+      const x = (e.clientX - rect.left) * (traceCanvas.width / rect.width);
+      const y = (e.clientY - rect.top) * (traceCanvas.height / rect.height);
+
+      traceCtx.beginPath();
+      traceCtx.moveTo(x, y);
+      traceCtx.strokeStyle = currentPenColor;
+      traceCtx.lineWidth = 14;
+      traceCtx.lineCap = 'round';
+      traceCtx.lineJoin = 'round';
+
+      // 쓱싹 효과음
+      playSound('pop');
+    }
+
+    function drawMove(e) {
+      if (!isDrawing) return;
+      const rect = traceCanvas.getBoundingClientRect();
+      const x = (e.clientX - rect.left) * (traceCanvas.width / rect.width);
+      const y = (e.clientY - rect.top) * (traceCanvas.height / rect.height);
+
+      traceCtx.lineTo(x, y);
+      traceCtx.stroke();
+    }
+
+    function endDraw(e) {
+      if (!isDrawing) return;
+      isDrawing = false;
+      try {
+        traceCanvas.releasePointerCapture(e.pointerId);
+      } catch (err) {}
+    }
+
+    function nextRoundGame3() {
+      isProcessing = false;
+      document.getElementById('celebrationOverlay').style.display = 'none';
+
+      initTraceCanvas();
+      clearTraceCanvas();
+
+      // 엄마 -> 형아 -> 아빠 -> 나 순환
+      traceTarget = familyData[traceTurnIndex % familyData.length];
+      traceTurnIndex++;
+
+      document.getElementById('g3-icon').innerText = traceTarget.icon;
+      const roleText = (traceTarget.role === '나') ? '내' : `${traceTarget.role}`;
+      document.getElementById('g3-prompt').innerText = `${roleText} 이름은 무엇일까요? 글씨를 따라 써봐요!`;
+      
+      // 흐릿하게 보여주는 정답 글씨 (예: 남호정, 윤호, 윤태환, 윤슬)
+      document.getElementById('traceGuideText').innerText = traceTarget.name;
+
+      currentVoiceText = `${roleText} 이름은? ${traceTarget.name}! 글씨를 예쁘게 따라 써봐요!`;
+      speakCurrent();
+    }
+
+    function finishTracing() {
+      if (isProcessing) return;
+      isProcessing = true;
+
+      // 축하 실로폰 소리 & 별점
+      playSound('correct');
+      starsCount++;
+      updateStars();
+
+      celebrateSuccess(traceTarget.name, () => {
+        nextRoundGame3();
+      });
     }
 
     /* =================== 공통 칭찬 피드백 =================== */
