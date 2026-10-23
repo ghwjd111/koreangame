@@ -776,7 +776,10 @@
           starsCount++;
           updateStars();
 
-          celebrateSuccess(puzzleTarget.name, () => nextRoundGame2());
+          // 완성된 글자를 1초 동안 기분 좋게 확인한 뒤 칭찬 화면 등장!
+          setTimeout(() => {
+            celebrateSuccess(puzzleTarget.name, () => nextRoundGame2());
+          }, 1000);
         }
       } else {
         // 순서가 아니거나 다른 글자일 때
