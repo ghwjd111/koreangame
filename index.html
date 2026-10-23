@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>윤슬의 한글게임</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      user-select: none;
+      -webkit-user-select: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Jua', sans-serif;
+      background: linear-gradient(135deg, #FFF9E6 0%, #E8F5E9 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow-x: hidden;
+      padding: 16px;
+      touch-action: none; /* 드래그 중 스크롤 방지 */
+    }
+
+    #game-container {
+      width: 100%;
+      max-width: 640px;
+      background: #FFFFFF;
+      border-radius: 36px;
+      padding: 24px 20px;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.08), 0 0 0 10px #FFF3D6;
+      text-align: center;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      min-height: 580px;
+      justify-content: space-between;
+    }
+
+    .header {
+      margin-bottom: 10px;
+    }
+
+    .title {
+      font-size: 2.2rem;
+      color: #FF6B6B;
+      text-shadow: 2px 2px 0px #FFE066;
+    }
+
+    .sub-title {
+      font-size: 1.15rem;
+      color: #4D96FF;
+      margin-top: 4px;
+    }
+
+    /* 모드 전환 버튼 */
+    .mode-switch {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin: 8px 0;
+    }
+
+    .mode-tab {
+      background: #EDF2F7;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-family: 'Jua', sans-serif;
+      font-size: 1rem;
+      color: #718096;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .mode-tab.active {
+      background: #FF6B6B;
+      color: white;
+      box-shadow: 0 4px 10px rgba(255, 107, 107, 0.4);
+    }
+
+    /* 드롭 대상 타겟 박스 (위쪽) */
+    .drop-target-area {
+      background: #F8F9FA;
+      border: 4px dashed #FFD166;
+      border-radius: 28px;
+      padding: 18px 16px;
+      margin: 12px 0;
+      position: relative;
+      transition: all 0.3s ease;
+    }
+
+    .drop-target-area.drag-over {
+      background: #FFF3CD;
+      border-color: #FF9F1C;
+      transform: scale(1.02);
+    }
+
+    .avatar-icon {
+      font-size: 4.8rem;
+      display: inline-block;
+      animation: float 2.4s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-8px); }
+    }
+
+    .target-guide {
+      font-size: 1.25rem;
+      color: #4A5568;
+      margin-top: 6px;
+    }
+
+    .target-box {
+      min-height: 72px;
+      margin-top: 10px;
+      border: 3px dashed #CBD5E0;
+      border-radius: 20px;
+      background: #FFFFFF;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.2rem;
+      color: #A0AEC0;
+      padding: 8px;
+      transition: all 0.2s;
+    }
+
+    .target-box.has-dropped {
+      border-color: #48BB78;
+      color: #2F855A;
+      background: #F0FFF4;
+    }
+
+    /* 목소리 다시 듣기 버튼 */
+    .tts-btn {
+      background: #FFD166;
+      border: none;
+      border-radius: 20px;
+      padding: 6px 16px;
+      font-family: 'Jua', sans-serif;
+      font-size: 1.05rem;
+      color: #5D4037;
+      cursor: pointer;
+      margin-top: 8px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 4px 0 #E5B339;
+    }
+
+    .tts-btn:active {
+      transform: translateY(2px);
+      box-shadow: 0 2px 0 #E5B339;
+    }
+
+    /* 드래그할 글자 블록들 (아래쪽) */
+    .drag-items-area {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 14px;
+      margin-top: 14px;
+      min-height: 80px;
+    }
+
+    .drag-block {
+      background: #FFFFFF;
+      border: 4px solid #4D96FF;
+      border-radius: 24px;
+      padding: 14px 22px;
+      font-family: 'Jua', sans-serif;
+      font-size: 2rem;
+      color: #2B6CB0;
+      cursor: grab;
+      box-shadow: 0 6px 0 #2B6CB0;
+      transition: transform 0.1s, box-shadow 0.1s;
+      touch-action: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 5;
+    }
+
+    .drag-block:active, .drag-block.dragging {
+      cursor: grabbing;
+      opacity: 0.9;
+      transform: scale(1.1);
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.25);
+      z-index: 999;
+    }
+
+    /* 별점 */
+    .score-container {
+      margin-top: 14px;
+      font-size: 1.4rem;
+      color: #FFB703;
+    }
+
+    /* 정답 축하 오버레이 */
+    .celebration-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border-radius: 36px;
+      background: rgba(255, 255, 255, 0.94);
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 20;
+      animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes popIn {
+      0% { transform: scale(0.7); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .celebration-emoji {
+      font-size: 5.5rem;
+      animation: heartBeat 0.7s infinite alternate;
+    }
+
+    @keyframes heartBeat {
+      from { transform: scale(1); }
+      to { transform: scale(1.2); }
+    }
+
+    .celebration-text {
+      font-size: 2.3rem;
+      color: #FF4D6D;
+      margin-top: 14px;
+    }
+
+    .shake-anim {
+      animation: shakeFail 0.4s ease;
+    }
+
+    @keyframes shakeFail {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-12px); }
+      40%, 80% { transform: translateX(12px); }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="game-container">
+    <!-- 헤더 -->
+    <div class="header">
+      <h1 class="title">✨ 윤슬의 한글게임 ✨</h1>
+      <div class="sub-title">글자를 끌어서 상자에 쏙! 넣어보세요</div>
+    </div>
+
+    <!-- 모드 선택 -->
+    <div class="mode-switch">
+      <button class="mode-tab active" id="tab-family-name" onclick="changeMode('familyToName')">호칭 ➔ 이름 쏙!</button>
+      <button class="mode-tab" id="tab-name-family" onclick="changeMode('nameToFamily')">이름 ➔ 호칭 쏙!</button>
+    </div>
+
+    <!-- 맞추는 영역 (드롭 타겟) -->
+    <div class="drop-target-area" id="dropArea">
+      <div class="avatar-icon" id="questionIcon">👩</div>
+      <div class="target-guide" id="questionGuide">엄마의 이름을 끌어다 놓아보세요!</div>
+      <div class="target-box" id="targetBox">여기에 글자를 쏙! 놓아주세요</div>
+      <button class="tts-btn" onclick="speakCurrentQuestion()">🔊 목소리로 듣기</button>
+    </div>
+
+    <!-- 드래그할 글자 목록 -->
+    <div class="drag-items-area" id="dragArea">
+      <!-- 동적 생성 -->
+    </div>
+
+    <!-- 별점 -->
+    <div class="score-container" id="starDisplay">
+      ⭐ 별 모으기: 0개
+    </div>
+
+    <!-- 정답 축하 팝업 -->
+    <div class="celebration-overlay" id="celebrationOverlay">
+      <div class="celebration-emoji" id="celebrationEmoji">🎉</div>
+      <div class="celebration-text" id="celebrationText">참 잘했어요!</div>
+    </div>
+  </div>
+
+  <script>
+    const familyData = [
+      { role: '엄마', name: '남호정', icon: '👩' },
+      { role: '아빠', name: '윤태환', icon: '👨' },
+      { role: '형아', name: '윤호',   icon: '👦' },
+      { role: '윤슬', name: '윤슬',   icon: '👧' }
+    ];
+
+    let currentMode = 'familyToName'; // 'familyToName' | 'nameToFamily'
+    let currentQuestion = null;
+    let starsCount = 0;
+    let isProcessing = false;
+
+    // Web Audio 사운드 효과
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    function playSound(type) {
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+      if (type === 'correct') {
+        const notes = [523.25, 659.25, 783.99, 1046.50];
+        notes.forEach((freq, idx) => {
+          const o = audioCtx.createOscillator();
+          const g = audioCtx.createGain();
+          o.type = 'triangle';
+          o.frequency.setValueAtTime(freq, audioCtx.currentTime + idx * 0.1);
+          g.gain.setValueAtTime(0.35, audioCtx.currentTime + idx * 0.1);
+          g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + idx * 0.1 + 0.28);
+          o.connect(g);
+          g.connect(audioCtx.destination);
+          o.start(audioCtx.currentTime + idx * 0.1);
+          o.stop(audioCtx.currentTime + idx * 0.1 + 0.3);
+        });
+      } else if (type === 'wrong') {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(220, audioCtx.currentTime);
+        osc.frequency.linearRampToValueAtTime(140, audioCtx.currentTime + 0.25);
+        gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.25);
+        osc.start(audioCtx.currentTime);
+        osc.stop(audioCtx.currentTime + 0.25);
+      }
+    }
+
+    // TTS 음성
+    function speakText(text) {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'ko-KR';
+        utterance.rate = 0.85;
+        utterance.pitch = 1.25;
+        window.speechSynthesis.speak(utterance);
+      }
+    }
+
+    function changeMode(mode) {
+      currentMode = mode;
+      document.getElementById('tab-family-name').classList.toggle('active', mode === 'familyToName');
+      document.getElementById('tab-name-family').classList.toggle('active', mode === 'nameToFamily');
+      nextRound();
+    }
+
+    function nextRound() {
+      isProcessing = false;
+      document.getElementById('celebrationOverlay').style.display = 'none';
+
+      const targetBox = document.getElementById('targetBox');
+      targetBox.innerText = '여기에 글자를 쏙! 놓아주세요';
+      targetBox.classList.remove('has-dropped');
+
+      // 무작위 문제 선택
+      const targetItem = familyData[Math.floor(Math.random() * familyData.length)];
+      currentQuestion = {
+        target: targetItem,
+        mode: currentMode
+      };
+
+      const iconEl = document.getElementById('questionIcon');
+      const guideEl = document.getElementById('questionGuide');
+      const dragArea = document.getElementById('dragArea');
+      dragArea.innerHTML = '';
+
+      iconEl.innerText = targetItem.icon;
+
+      let promptVoice = '';
+      let answerText = '';
+
+      if (currentMode === 'familyToName') {
+        guideEl.innerText = `[${targetItem.role}]의 이름을 상자에 끌어다 놓아보세요!`;
+        answerText = targetItem.name;
+        promptVoice = `${targetItem.role}! ${targetItem.role}의 이름을 끌어서 넣어보세요!`;
+      } else {
+        guideEl.innerText = `[${targetItem.name}]은(는) 누구일까요? 상자에 쏙!`;
+        answerText = targetItem.role;
+        promptVoice = `${targetItem.name}! ${targetItem.name}은 누구일까요? 끌어서 넣어보세요!`;
+      }
+
+      currentQuestion.correctAnswer = answerText;
+      currentQuestion.voiceText = promptVoice;
+
+      // 보기 생성 (4개 가족 모두 제시하거나 3개)
+      let choices = [];
+      if (currentMode === 'familyToName') {
+        choices = familyData.map(d => d.name);
+      } else {
+        choices = familyData.map(d => d.role);
+      }
+      shuffleArray(choices);
+
+      // 드래그 가능한 블록 생성 (마우스 + 터치 포인터 이벤트 모두 지원)
+      choices.forEach(text => {
+        const block = createDraggableBlock(text);
+        dragArea.appendChild(block);
+      });
+
+      speakText(promptVoice);
+    }
+
+    function speakCurrentQuestion() {
+      if (currentQuestion && currentQuestion.voiceText) {
+        speakText(currentQuestion.voiceText);
+      }
+    }
+
+    // 마우스 및 모바일/태블릿 터치 드래그 앤 드롭 구현
+    function createDraggableBlock(text) {
+      const block = document.createElement('div');
+      block.className = 'drag-block';
+      block.innerText = text;
+      block.dataset.value = text;
+
+      let startX = 0, startY = 0;
+      let initialLeft = 0, initialTop = 0;
+      let isDragging = false;
+
+      // PointerDown (마우스 클릭 또는 손가락 터치)
+      block.onpointerdown = (e) => {
+        if (isProcessing) return;
+        isDragging = true;
+        block.setPointerCapture(e.pointerId);
+
+        // 클릭시 해당 글자 읽어주기
+        speakText(text);
+
+        startX = e.clientX;
+        startY = e.clientY;
+
+        block.classList.add('dragging');
+        block.style.position = 'relative';
+        block.style.zIndex = 1000;
+      };
+
+      // PointerMove
+      block.onpointermove = (e) => {
+        if (!isDragging) return;
+        const dx = e.clientX - startX;
+        const dy = e.clientY - startY;
+        block.style.transform = `translate(${dx}px, ${dy}px) scale(1.12)`;
+
+        // 타겟 박스 위에 있는지 체크
+        const targetBox = document.getElementById('targetBox');
+        const boxRect = targetBox.getBoundingClientRect();
+        if (
+          e.clientX >= boxRect.left &&
+          e.clientX <= boxRect.right &&
+          e.clientY >= boxRect.top &&
+          e.clientY <= boxRect.bottom
+        ) {
+          document.getElementById('dropArea').classList.add('drag-over');
+        } else {
+          document.getElementById('dropArea').classList.remove('drag-over');
+        }
+      };
+
+      // PointerUp
+      block.onpointerup = (e) => {
+        if (!isDragging) return;
+        isDragging = false;
+        block.releasePointerCapture(e.pointerId);
+        block.classList.remove('dragging');
+        document.getElementById('dropArea').classList.remove('drag-over');
+
+        const targetBox = document.getElementById('targetBox');
+        const boxRect = targetBox.getBoundingClientRect();
+
+        // 타겟 박스 안에 놓였는지 판정
+        const droppedInTarget = (
+          e.clientX >= boxRect.left - 20 &&
+          e.clientX <= boxRect.right + 20 &&
+          e.clientY >= boxRect.top - 20 &&
+          e.clientY <= boxRect.bottom + 20
+        );
+
+        if (droppedInTarget) {
+          checkAnswer(text, block);
+        } else {
+          // 원래 위치로 원복
+          block.style.transition = 'transform 0.2s ease';
+          block.style.transform = 'translate(0px, 0px)';
+          setTimeout(() => {
+            block.style.transition = '';
+            block.style.position = '';
+            block.style.zIndex = '';
+          }, 200);
+        }
+      };
+
+      block.onpointercancel = () => {
+        isDragging = false;
+        block.classList.remove('dragging');
+        block.style.transform = 'translate(0px, 0px)';
+      };
+
+      return block;
+    }
+
+    function checkAnswer(selectedText, blockEl) {
+      const targetBox = document.getElementById('targetBox');
+
+      if (selectedText === currentQuestion.correctAnswer) {
+        // 정답!
+        isProcessing = true;
+        playSound('correct');
+        starsCount++;
+        updateStars();
+
+        targetBox.innerText = `✨ ${selectedText} ✨`;
+        targetBox.classList.add('has-dropped');
+        blockEl.style.visibility = 'hidden';
+
+        const praises = [
+          '정답이에요! 참 잘했어요!',
+          '우와! 윤슬이 대단해요!',
+          '쏙 들어갔네요! 최고예요!',
+          '딩동댕! 아주 잘했어요!'
+        ];
+        const celebrationVoice = praises[Math.floor(Math.random() * praises.length)];
+        const emojis = ['🌟', '💖', '🎉', '👏', '🥳', '🎈'];
+
+        document.getElementById('celebrationEmoji').innerText = emojis[Math.floor(Math.random() * emojis.length)];
+        document.getElementById('celebrationText').innerText = celebrationVoice;
+        document.getElementById('celebrationOverlay').style.display = 'flex';
+
+        speakText(`${selectedText}! ${celebrationVoice}`);
+
+        setTimeout(() => {
+          nextRound();
+        }, 1800);
+      } else {
+        // 오답
+        playSound('wrong');
+        const dropArea = document.getElementById('dropArea');
+        dropArea.classList.add('shake-anim');
+
+        // 원래 위치로 복귀
+        blockEl.style.transition = 'transform 0.25s ease';
+        blockEl.style.transform = 'translate(0px, 0px)';
+        setTimeout(() => {
+          blockEl.style.transition = '';
+          blockEl.style.position = '';
+          blockEl.style.zIndex = '';
+          dropArea.classList.remove('shake-anim');
+        }, 400);
+
+        speakText(`어라? 다시 다른 글자를 끌어와 볼까요?`);
+      }
+    }
+
+    function updateStars() {
+      let starStr = `⭐ 별 모으기: ${starsCount}개 (`;
+      const displayStars = Math.min(starsCount, 8);
+      for (let i = 0; i < displayStars; i++) {
+        starStr += '⭐';
+      }
+      starStr += ')';
+      document.getElementById('starDisplay').innerText = starStr;
+    }
+
+    function shuffleArray(arr) {
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    window.addEventListener('load', () => {
+      nextRound();
+    });
+  </script>
+</body>
+</html>
