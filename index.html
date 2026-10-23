@@ -437,61 +437,107 @@
     let puzzleTarget = null; // { role, name, icon }
     let puzzleFilledCount = 0; // 몇 번째 글자까지 채웠는지
 
-    // 사운드
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    // 사운드 및 브라우저 AudioContext 안전 초기화
+    let audioCtx = null;
+    function getAudioContext() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+      return audioCtx;
+    }
+
     function playSound(type) {
-      if (audioCtx.state === 'suspended') audioCtx.resume();
-      if (type === 'correct') {
-        const notes = [523.25, 659.25, 783.99, 1046.50];
-        notes.forEach((freq, idx) => {
-          const o = audioCtx.createOscillator();
-          const g = audioCtx.createGain();
-          o.type = 'triangle';
-          o.frequency.setValueAtTime(freq, audioCtx.currentTime + idx * 0.1);
-          g.gain.setValueAtTime(0.3, audioCtx.currentTime + idx * 0.1);
-          g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + idx * 0.1 + 0.25);
+      try {
+        const ctx = getAudioContext();
+        if (type === 'correct') {
+          const notes = [523.25, 659.25, 783.99, 1046.50];
+          notes.forEach((freq, idx) => {
+            const o = ctx.createOscillator();
+            const g = ctx.createGain();
+            o.type = 'triangle';
+            o.frequency.setValueAtTime(freq, ctx.currentTime + idx * 0.1);
+            g.gain.setValueAtTime(0.35, ctx.currentTime + idx * 0.1);
+            g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + idx * 0.1 + 0.25);
+            o.connect(g);
+            g.connect(ctx.destination);
+            o.start(ctx.currentTime + idx * 0.1);
+            o.stop(ctx.currentTime + idx * 0.1 + 0.3);
+          });
+        } else if (type === 'pop') {
+          const o = ctx.createOscillator();
+          const g = ctx.createGain();
+          o.type = 'sine';
+          o.frequency.setValueAtTime(450, ctx.currentTime);
+          o.frequency.exponentialRampToValueAtTime(800, ctx.currentTime + 0.12);
+          g.gain.setValueAtTime(0.3, ctx.currentTime);
+          g.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.12);
           o.connect(g);
-          g.connect(audioCtx.destination);
-          o.start(audioCtx.currentTime + idx * 0.1);
-          o.stop(audioCtx.currentTime + idx * 0.1 + 0.3);
-        });
-      } else if (type === 'wrong') {
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(220, audioCtx.currentTime);
-        osc.frequency.linearRampToValueAtTime(140, audioCtx.currentTime + 0.25);
-        gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.25);
-        osc.start(audioCtx.currentTime);
-        osc.stop(audioCtx.currentTime + 0.25);
-      } else if (type === 'pop') {
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(440, audioCtx.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.1);
-        gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
-        osc.start(audioCtx.currentTime);
-        osc.stop(audioCtx.currentTime + 0.1);
+          g.connect(ctx.destination);
+          o.start(ctx.currentTime);
+          o.stop(ctx.currentTime + 0.12);
+        } else if (type === 'wrong') {
+          const o = ctx.createOscillator();
+          const g = ctx.createGain();
+          o.type = 'sawtooth';
+          o.frequency.setValueAtTime(220, ctx.currentTime);
+          o.frequency.linearRampToValueAtTime(140, ctx.currentTime + 0.22);
+          g.gain.setValueAtTime(0.2, ctx.currentTime);
+          g.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.22);
+          o.connect(g);
+          g.connect(ctx.destination);
+          o.start(ctx.currentTime);
+          o.stop(ctx.currentTime + 0.22);
+        }
+      } catch (e) {
+        console.warn('Audio error:', e);
       }
     }
 
-    // 아이 목소리 톤 (밝고 맑은 높은 피치: pitch 1.45, rate 0.9)
-    function speakChildVoice(text, onEnd) {
+    // 한국어 음성 목록 캐싱 (브라우저가 준비될 때 로드)
+    let koreanVoice = null;
+    function loadVoices() {
       if ('speechSynthesis' in window) {
+        const voices = window.speechSynthesis.getVoices();
+        koreanVoice = voices.find(v => v.lang === 'ko-KR' || v.lang.startsWith('ko')) || null;
+      }
+    }
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.onvoiceschanged = loadVoices;
+      loadVoices();
+    }
+
+    // 아이 목소리 톤 (밝고 맑은 높은 피치: pitch 1.35, rate 0.95)
+    function speakChildVoice(text, onEnd) {
+      if (!('speechSynthesis' in window)) return;
+      try {
+        // 브라우저 AudioContext 깨우기
+        getAudioContext();
+
+        // 중복 취소 후 안전 발화
         window.speechSynthesis.cancel();
+
         const utterance = new SpeechSynthesisUtterance(text);
         utterance.lang = 'ko-KR';
-        utterance.pitch = 1.45; // 귀엽고 맑은 아이 톤
-        utterance.rate = 0.9;   // 한 글자 한 글자 또박또박
+        if (koreanVoice) utterance.voice = koreanVoice;
+        utterance.pitch = 1.35; // 아이 톤 (호환성 있는 1.35)
+        utterance.rate = 0.95;   // 또박또박한 속도
+        utterance.volume = 1.0;
+
         if (onEnd) utterance.onend = onEnd;
-        window.speechSynthesis.speak(utterance);
+
+        // 크롬 브라우저 음성 엔진 pause 버그 방지
+        if (window.speechSynthesis.paused) {
+          window.speechSynthesis.resume();
+        }
+
+        setTimeout(() => {
+          window.speechSynthesis.speak(utterance);
+        }, 30);
+      } catch (e) {
+        console.warn('TTS error:', e);
       }
     }
 
@@ -590,19 +636,22 @@
       if (isProcessing) return;
       if (selectedText === g1Answer) {
         isProcessing = true;
-        // 고른 한글 읽어주기
+        // 효과음 + 글자 읽어주기 동시 재생
+        playSound('correct');
         speakText(selectedText);
+
         starsCount++;
         updateStars();
         btnEl.style.background = '#C6F6D5';
 
         setTimeout(() => {
           celebrateSuccess(selectedText, () => nextRoundGame1());
-        }, 800);
+        }, 1000);
       } else {
+        playSound('wrong');
         btnEl.style.background = '#FED7D7';
         // 고른 한글 읽어준 뒤 다시 찾아보게 안내
-        speakText(`${selectedText}! 어라? 다시 한번 찾아볼까요?`);
+        speakText(`${selectedText}! 다시 한번 찾아볼까요?`);
         setTimeout(() => {
           btnEl.style.background = '#FFFFFF';
         }, 600);
@@ -763,8 +812,10 @@
       const neededChar = puzzleTarget.name[puzzleFilledCount];
 
       if (charText === neededChar) {
-        // 일치! 슬롯에 쏙 들어감 (효과음 대신 고른 한글을 아이 목소리로 읽음)
+        // 일치! 실로폰 통통 소리와 함께 한글 글자 음성 읽어주기
+        playSound('pop');
         speakText(charText);
+
         const slot = document.getElementById(`slot-${puzzleFilledCount}`);
         slot.innerText = charText;
         slot.classList.add('filled');
@@ -779,16 +830,19 @@
         } else {
           // 전체 이름 완성!
           isProcessing = true;
+          // 이름 완성 축하 실로폰 소리!
+          playSound('correct');
           starsCount++;
           updateStars();
 
-          // 완성된 글자를 1초 동안 기분 좋게 확인한 뒤 칭찬 화면 등장!
+          // 1초 뒤 칭찬 화면 등장
           setTimeout(() => {
             celebrateSuccess(puzzleTarget.name, () => nextRoundGame2());
           }, 1000);
         }
       } else {
-        // 순서가 아니거나 다른 글자일 때 (고른 글자 소리 내며 다시 해보게 함)
+        // 틀렸을 때 통! 소리와 함께 고른 글자 발음
+        playSound('wrong');
         resetBlockPos(blockEl);
 
         const currentSlot = document.getElementById(`slot-${puzzleFilledCount}`);
@@ -797,12 +851,15 @@
           if (currentSlot) currentSlot.classList.remove('shake-anim');
         }, 400);
 
-        speakText(`${charText}! 어라? 다른 글자를 찾아볼까요?`);
+        speakText(`${charText}! 다른 글자를 찾아볼까요?`);
       }
     }
 
     /* =================== 공통 칭찬 피드백 =================== */
     function celebrateSuccess(word, callback) {
+      // 칭찬 화면 뜰 때도 신나는 축하 멜로디 울림!
+      playSound('correct');
+
       const praises = [
         '참 잘했어요!',
         '우리 윤슬이 최고!',
@@ -819,12 +876,12 @@
       document.getElementById('celebrationText').innerText = displayedText;
       document.getElementById('celebrationOverlay').style.display = 'flex';
 
-      // 칭찬 화면에 나오는 글자 그대로 아이 목소리로 읽어주기!
+      // 칭찬 화면 글자를 아이 목소리로 읽어주기!
       speakText(displayedText);
 
       setTimeout(() => {
         callback();
-      }, 2200);
+      }, 2300);
     }
 
     function updateStars() {
