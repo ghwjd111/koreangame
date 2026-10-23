@@ -30,24 +30,20 @@
 
     #game-container {
       width: 100%;
-      max-width: 600px;
+      max-width: 640px;
       background: #FFFFFF;
       border-radius: 36px;
-      padding: 24px 20px;
+      padding: 22px 18px;
       box-shadow: 0 16px 40px rgba(0, 0, 0, 0.08), 0 0 0 10px #FFF3D6;
       text-align: center;
       position: relative;
       display: flex;
       flex-direction: column;
-      min-height: 520px;
+      min-height: 560px;
       justify-content: space-between;
     }
 
     /* 상단 헤더 */
-    .header {
-      margin-bottom: 12px;
-    }
-
     .title {
       font-size: 2.2rem;
       color: #FF6B6B;
@@ -61,99 +57,209 @@
       margin-top: 4px;
     }
 
-    /* 퀴즈 영역 */
-    .quiz-card {
-      background: #F8F9FA;
-      border: 4px dashed #FFD166;
-      border-radius: 28px;
-      padding: 20px 10px;
-      margin: 14px 0;
-      transition: all 0.3s ease;
-    }
-
-    .avatar-icon {
-      font-size: 4.8rem;
-      display: inline-block;
-      filter: drop-shadow(0 6px 8px rgba(0,0,0,0.1));
-      animation: float 2.4s ease-in-out infinite;
-    }
-
-    @keyframes float {
-      0%, 100% { transform: translateY(0px) rotate(0deg); }
-      50% { transform: translateY(-8px) rotate(3deg); }
-    }
-
-    .prompt-label {
-      font-size: 1.25rem;
-      color: #6C757D;
-      margin-top: 6px;
-    }
-
-    .target-word {
-      font-size: 2.6rem;
-      color: #333333;
-      margin-top: 4px;
-      font-weight: bold;
-    }
-
-    /* 보기 버튼 목록 */
-    .options-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 14px;
-      margin-top: 10px;
-    }
-
-    .option-btn {
-      background: #FFFFFF;
-      border: 4px solid #6BCB77;
-      border-radius: 24px;
-      padding: 16px 8px;
-      font-family: 'Jua', sans-serif;
-      font-size: 2rem;
-      color: #2D3748;
-      cursor: pointer;
-      box-shadow: 0 6px 0 #4EA85A;
-      transition: transform 0.1s, box-shadow 0.1s;
-      outline: none;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    .option-btn:hover {
-      background: #F0FFF4;
-    }
-
-    .option-btn:active {
-      transform: translateY(4px);
-      box-shadow: 0 2px 0 #4EA85A;
-    }
-
-    /* 모드 전환 탭 버튼 */
-    .mode-switch {
+    /* 최상단 대메뉴: 게임 1 vs 게임 2 선택 버튼 */
+    .main-game-nav {
       display: flex;
       justify-content: center;
-      gap: 10px;
-      margin-bottom: 8px;
+      gap: 12px;
+      margin: 14px 0 8px 0;
     }
 
-    .mode-tab {
+    .nav-btn {
+      flex: 1;
+      max-width: 250px;
       background: #EDF2F7;
-      border: none;
-      padding: 8px 14px;
-      border-radius: 20px;
+      border: 3px solid #CBD5E0;
+      padding: 12px 10px;
+      border-radius: 22px;
+      font-family: 'Jua', sans-serif;
+      font-size: 1.15rem;
+      color: #4A5568;
+      cursor: pointer;
+      box-shadow: 0 4px 0 #CBD5E0;
+      transition: all 0.2s;
+    }
+
+    .nav-btn.active {
+      background: #FF6B6B;
+      border-color: #E53E3E;
+      color: #FFFFFF;
+      box-shadow: 0 5px 0 #C53030;
+      transform: translateY(-2px);
+    }
+
+    /* =================== 게임 1: 콕콕 선택 퀴즈 =================== */
+    .game1-submodes {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin: 6px 0 12px 0;
+    }
+
+    .submode-btn {
+      background: #F7FAFC;
+      border: 2px solid #E2E8F0;
+      padding: 6px 12px;
+      border-radius: 16px;
       font-family: 'Jua', sans-serif;
       font-size: 0.95rem;
       color: #718096;
       cursor: pointer;
     }
 
-    .mode-tab.active {
-      background: #FF6B6B;
+    .submode-btn.active {
+      background: #4D96FF;
+      border-color: #3182CE;
       color: white;
-      box-shadow: 0 4px 10px rgba(255, 107, 107, 0.4);
     }
 
-    /* 다시 듣기 버튼 */
+    .quiz-card {
+      background: #F8F9FA;
+      border: 4px dashed #FFD166;
+      border-radius: 28px;
+      padding: 18px 12px;
+      margin-bottom: 12px;
+    }
+
+    .avatar-icon {
+      font-size: 4.6rem;
+      display: inline-block;
+      animation: float 2.4s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-8px); }
+    }
+
+    .prompt-label {
+      font-size: 1.3rem;
+      color: #4A5568;
+      margin-top: 6px;
+    }
+
+    .target-word {
+      font-size: 2.5rem;
+      color: #2D3748;
+      margin-top: 4px;
+      font-weight: bold;
+    }
+
+    .options-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    .option-btn {
+      background: #FFFFFF;
+      border: 4px solid #6BCB77;
+      border-radius: 22px;
+      padding: 14px 6px;
+      font-family: 'Jua', sans-serif;
+      font-size: 2rem;
+      color: #2D3748;
+      cursor: pointer;
+      box-shadow: 0 5px 0 #4EA85A;
+      transition: transform 0.1s;
+      outline: none;
+    }
+
+    .option-btn:active {
+      transform: translateY(3px);
+      box-shadow: 0 2px 0 #4EA85A;
+    }
+
+    /* =================== 게임 2: 한 글자씩 끌어서 완성 =================== */
+    .game2-card {
+      background: #FFF9ED;
+      border: 4px dashed #FFB703;
+      border-radius: 28px;
+      padding: 16px 12px;
+      margin-bottom: 12px;
+    }
+
+    /* 완성 슬롯 (남 [ ] [ ]) */
+    .slots-container {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin: 16px 0 10px 0;
+    }
+
+    .slot-box {
+      width: 72px;
+      height: 72px;
+      border: 3.5px dashed #CBD5E0;
+      border-radius: 20px;
+      background: #FFFFFF;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.3rem;
+      color: #A0AEC0;
+      transition: all 0.2s;
+    }
+
+    .slot-box.filled {
+      border: 3.5px solid #48BB78;
+      background: #F0FFF4;
+      color: #22543D;
+      animation: popSlot 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .slot-box.drag-over {
+      background: #FEFCBF;
+      border-color: #D69E2E;
+      transform: scale(1.08);
+    }
+
+    @keyframes popSlot {
+      0% { transform: scale(0.6); }
+      100% { transform: scale(1); }
+    }
+
+    /* 섞인 글자 블록 바구니 */
+    .letters-basket {
+      background: #F7FAFC;
+      border: 3px solid #E2E8F0;
+      border-radius: 24px;
+      padding: 14px 10px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px;
+      min-height: 85px;
+      margin-top: 8px;
+    }
+
+    .letter-block {
+      width: 64px;
+      height: 64px;
+      background: #FFFFFF;
+      border: 3.5px solid #4D96FF;
+      border-radius: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.2rem;
+      color: #2B6CB0;
+      cursor: grab;
+      box-shadow: 0 5px 0 #2B6CB0;
+      touch-action: none;
+      user-select: none;
+    }
+
+    .letter-block:active, .letter-block.dragging {
+      cursor: grabbing;
+      transform: scale(1.15);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.25);
+      z-index: 1000;
+      opacity: 0.95;
+    }
+
+    /* 공통 음성 다시듣기 버튼 */
     .tts-btn {
       background: #FFD166;
       border: none;
@@ -163,7 +269,7 @@
       font-size: 1.05rem;
       color: #5D4037;
       cursor: pointer;
-      margin-top: 8px;
+      margin-top: 6px;
       display: inline-flex;
       align-items: center;
       gap: 6px;
@@ -175,14 +281,14 @@
       box-shadow: 0 2px 0 #E5B339;
     }
 
-    /* 별점 / 진행도 */
+    /* 하단 별점 */
     .score-container {
       margin-top: 10px;
       font-size: 1.3rem;
       color: #FFB703;
     }
 
-    /* 축하 효과 애니메이션 오버레이 */
+    /* 축하 화면 오버레이 */
     .celebration-overlay {
       position: absolute;
       top: 0;
@@ -190,12 +296,12 @@
       width: 100%;
       height: 100%;
       border-radius: 36px;
-      background: rgba(255, 255, 255, 0.92);
+      background: rgba(255, 255, 255, 0.95);
       display: none;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      z-index: 10;
+      z-index: 20;
       animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
 
@@ -205,7 +311,7 @@
     }
 
     .celebration-emoji {
-      font-size: 5rem;
+      font-size: 5.2rem;
       animation: heartBeat 0.7s infinite alternate;
     }
 
@@ -220,17 +326,8 @@
       margin-top: 12px;
     }
 
-    .correct-flash {
-      animation: flashSuccess 0.5s ease;
-    }
-
-    .wrong-flash {
+    .shake-anim {
       animation: shakeFail 0.4s ease;
-    }
-
-    @keyframes flashSuccess {
-      0% { background: #C6F6D5; }
-      100% { background: #FFFFFF; }
     }
 
     @keyframes shakeFail {
@@ -246,36 +343,68 @@
     <!-- 헤더 -->
     <div class="header">
       <h1 class="title">✨ 윤슬의 한글게임 ✨</h1>
-      <div class="sub-title">우리가족 이름을 맞춰봐요!</div>
+      <div class="sub-title" id="subTitleText">우리가족 이름을 맞춰봐요!</div>
     </div>
 
-    <!-- 모드 선택 탭 -->
-    <div class="mode-switch">
-      <button class="mode-tab active" id="tab-mode-name" onclick="changeMode('familyToName')">호칭 ➔ 이름 맞추기</button>
-      <button class="mode-tab" id="tab-mode-family" onclick="changeMode('nameToFamily')">이름 ➔ 호칭 맞추기</button>
-      <button class="mode-tab" id="tab-mode-word" onclick="changeMode('wordMatch')">같은 글자 짝꿍</button>
+    <!-- 🎮 두 게임 간 전환 탭 버튼 -->
+    <div class="main-game-nav">
+      <button class="nav-btn active" id="btn-main-game1" onclick="switchMainGame('click')">
+        👉 콕콕 누르기 게임
+      </button>
+      <button class="nav-btn" id="btn-main-game2" onclick="switchMainGame('puzzle')">
+        🧩 글자 모아 완성하기
+      </button>
     </div>
 
-    <!-- 문제 카드 -->
-    <div class="quiz-card" id="quizCard">
-      <div class="avatar-icon" id="questionIcon">👩</div>
-      <div class="prompt-label" id="questionPrompt">엄마의 이름은 무엇일까요?</div>
-      <div class="target-word" id="questionWord">엄마</div>
-      <br>
-      <button class="tts-btn" onclick="speakCurrentQuestion()">🔊 목소리로 듣기</button>
+    <!-- ======================= 1. 콕콕 누르기 게임 뷰 ======================= -->
+    <div id="view-game1">
+      <div class="game1-submodes">
+        <button class="submode-btn active" id="subtab-1" onclick="setGame1Mode('familyToName')">호칭 ➔ 이름</button>
+        <button class="submode-btn" id="subtab-2" onclick="setGame1Mode('nameToFamily')">이름 ➔ 호칭</button>
+        <button class="submode-btn" id="subtab-3" onclick="setGame1Mode('wordMatch')">같은 글자 짝꿍</button>
+      </div>
+
+      <div class="quiz-card">
+        <div class="avatar-icon" id="g1-icon">👩</div>
+        <div class="prompt-label" id="g1-prompt">엄마의 이름은 무엇일까요?</div>
+        <div class="target-word" id="g1-word">엄마</div>
+        <br>
+        <button class="tts-btn" onclick="speakCurrent()">🔊 목소리로 듣기</button>
+      </div>
+
+      <div class="options-grid" id="g1-options">
+        <!-- 버튼 동적 생성 -->
+      </div>
     </div>
 
-    <!-- 보기 버튼 (4개 or 3개) -->
-    <div class="options-grid" id="optionsGrid">
-      <!-- 동적 생성 -->
+    <!-- ======================= 2. 섞인 글자 순서대로 끌어오기 게임 뷰 ======================= -->
+    <div id="view-game2" style="display: none;">
+      <div class="game2-card">
+        <div class="avatar-icon" id="g2-icon">👩</div>
+        <div class="prompt-label" id="g2-prompt">엄마 이름을 순서대로 끌어와서 맞춰보세요!</div>
+        <div class="target-word" id="g2-target-name">엄마 (남호정)</div>
+
+        <!-- 완성 글자 슬롯 영역 (예: [남] [ ] [ ]) -->
+        <div class="slots-container" id="g2-slots">
+          <!-- 동적 생성 -->
+        </div>
+
+        <button class="tts-btn" onclick="speakCurrent()">🔊 목소리로 듣기</button>
+      </div>
+
+      <!-- 섞여 있는 글자 바구니 -->
+      <div style="font-size: 1.05rem; color: #718096; margin-bottom: 4px;">👇 글자를 꾹 끌어서 위 상자에 쏙! 넣어보세요 (클릭도 가능해요)</div>
+      <div class="letters-basket" id="g2-basket">
+        <!-- 동적 생성 (예: 남, 윤, 정, 호, 슬, 태 등) -->
+      </div>
     </div>
 
-    <!-- 점수 / 진행 -->
+    <!-- 점수 / 별 모으기 -->
     <div class="score-container" id="starDisplay">
       ⭐ 별 모으기: 0개
     </div>
 
-    <!-- 정답 오버레이 -->
+    <!-- 축하 애니메이션 오버레이 -->
     <div class="celebration-overlay" id="celebrationOverlay">
       <div class="celebration-emoji" id="celebrationEmoji">🎉</div>
       <div class="celebration-text" id="celebrationText">참 잘했어요!</div>
@@ -283,7 +412,7 @@
   </div>
 
   <script>
-    // 가족 데이터 (윤슬이는 5살 남아 캐릭터 👦🏻/🧒)
+    // 가족 데이터 (윤슬이는 5살 남아 🧒)
     const familyData = [
       { role: '엄마', name: '남호정', icon: '👩' },
       { role: '아빠', name: '윤태환', icon: '👨' },
@@ -291,18 +420,23 @@
       { role: '윤슬', name: '윤슬',   icon: '🧒' }
     ];
 
-    let currentMode = 'familyToName'; // 'familyToName' | 'nameToFamily' | 'wordMatch'
-    let currentQuestion = null;
+    // 가족 글자 풀 (남, 호, 정, 윤, 태, 환, 호, 슬)
+    const allFamilyChars = ['남', '호', '정', '윤', '태', '환', '슬'];
+
+    let currentMainGame = 'click'; // 'click' | 'puzzle'
+    let game1Mode = 'familyToName'; // 'familyToName' | 'nameToFamily' | 'wordMatch'
     let starsCount = 0;
     let isProcessing = false;
+    let currentVoiceText = '';
 
-    // Web Audio API 효과음
+    // 게임 2(퍼즐) 상태 변수
+    let puzzleTarget = null; // { role, name, icon }
+    let puzzleFilledCount = 0; // 몇 번째 글자까지 채웠는지
+
+    // 사운드
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-
     function playSound(type) {
-      if (audioCtx.state === 'suspended') {
-        audioCtx.resume();
-      }
+      if (audioCtx.state === 'suspended') audioCtx.resume();
       if (type === 'correct') {
         const notes = [523.25, 659.25, 783.99, 1046.50];
         notes.forEach((freq, idx) => {
@@ -324,162 +458,358 @@
         gain.connect(audioCtx.destination);
         osc.type = 'sawtooth';
         osc.frequency.setValueAtTime(220, audioCtx.currentTime);
-        osc.frequency.linearRampToValueAtTime(150, audioCtx.currentTime + 0.25);
-        gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
+        osc.frequency.linearRampToValueAtTime(140, audioCtx.currentTime + 0.25);
+        gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
         gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.25);
         osc.start(audioCtx.currentTime);
         osc.stop(audioCtx.currentTime + 0.25);
+      } else if (type === 'pop') {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(440, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.1);
+        gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+        osc.start(audioCtx.currentTime);
+        osc.stop(audioCtx.currentTime + 0.1);
       }
     }
 
-    // TTS 목소리 말하기
     function speakText(text) {
       if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
         const utterance = new SpeechSynthesisUtterance(text);
         utterance.lang = 'ko-KR';
-        utterance.rate = 0.85; // 5세 아이 눈높이에 맞춰 천천히 또박또박
+        utterance.rate = 0.85;
         utterance.pitch = 1.2;
         window.speechSynthesis.speak(utterance);
       }
     }
 
-    function changeMode(mode) {
-      currentMode = mode;
-      document.getElementById('tab-mode-name').classList.toggle('active', mode === 'familyToName');
-      document.getElementById('tab-mode-family').classList.toggle('active', mode === 'nameToFamily');
-      document.getElementById('tab-mode-word').classList.toggle('active', mode === 'wordMatch');
-      nextRound();
+    function speakCurrent() {
+      if (currentVoiceText) speakText(currentVoiceText);
     }
 
-    function nextRound() {
+    /* =================== 대메뉴 전환 =================== */
+    function switchMainGame(gameType) {
+      currentMainGame = gameType;
+      document.getElementById('btn-main-game1').classList.toggle('active', gameType === 'click');
+      document.getElementById('btn-main-game2').classList.toggle('active', gameType === 'puzzle');
+
+      const v1 = document.getElementById('view-game1');
+      const v2 = document.getElementById('view-game2');
+      const subTitle = document.getElementById('subTitleText');
+
+      if (gameType === 'click') {
+        v1.style.display = 'block';
+        v2.style.display = 'none';
+        subTitle.innerText = '우리가족 이름을 버튼으로 콕콕 맞춰봐요!';
+        nextRoundGame1();
+      } else {
+        v1.style.display = 'none';
+        v2.style.display = 'block';
+        subTitle.innerText = '섞여있는 글자를 순서대로 끌어와서 이름을 완성해요!';
+        nextRoundGame2();
+      }
+    }
+
+    /* =================== 게임 1: 콕콕 누르기 로직 =================== */
+    function setGame1Mode(mode) {
+      game1Mode = mode;
+      document.getElementById('subtab-1').classList.toggle('active', mode === 'familyToName');
+      document.getElementById('subtab-2').classList.toggle('active', mode === 'nameToFamily');
+      document.getElementById('subtab-3').classList.toggle('active', mode === 'wordMatch');
+      nextRoundGame1();
+    }
+
+    let g1Target = null;
+    let g1Answer = '';
+
+    function nextRoundGame1() {
       isProcessing = false;
       document.getElementById('celebrationOverlay').style.display = 'none';
 
-      const targetItem = familyData[Math.floor(Math.random() * familyData.length)];
-      currentQuestion = {
-        target: targetItem,
-        mode: currentMode
-      };
+      g1Target = familyData[Math.floor(Math.random() * familyData.length)];
+      const iconEl = document.getElementById('g1-icon');
+      const promptEl = document.getElementById('g1-prompt');
+      const wordEl = document.getElementById('g1-word');
+      const optContainer = document.getElementById('g1-options');
+      optContainer.innerHTML = '';
 
-      const iconEl = document.getElementById('questionIcon');
-      const promptEl = document.getElementById('questionPrompt');
-      const wordEl = document.getElementById('questionWord');
-      const optionsGrid = document.getElementById('optionsGrid');
-      optionsGrid.innerHTML = '';
+      iconEl.innerText = g1Target.icon;
 
-      iconEl.innerText = targetItem.icon;
-
-      let answerText = '';
-      let promptVoice = '';
-
-      if (currentMode === 'familyToName') {
-        promptEl.innerText = `${targetItem.role}의 이름은 무엇일까요?`;
-        wordEl.innerText = targetItem.role;
-        answerText = targetItem.name;
-        promptVoice = `${targetItem.role}! ${targetItem.role}의 이름은 무엇일까요?`;
-      } else if (currentMode === 'nameToFamily') {
-        promptEl.innerText = `${targetItem.name}은(는) 누구일까요?`;
-        wordEl.innerText = targetItem.name;
-        answerText = targetItem.role;
-        promptVoice = `${targetItem.name}! 누구일까요?`;
-      } else if (currentMode === 'wordMatch') {
-        promptEl.innerText = `똑같은 글자를 찾아보세요!`;
-        wordEl.innerText = targetItem.name;
-        answerText = targetItem.name;
-        promptVoice = `${targetItem.name}! 똑같은 글자를 찾아보세요!`;
-      }
-
-      currentQuestion.correctAnswer = answerText;
-      currentQuestion.voiceText = promptVoice;
-
-      let candidatePool = [];
-      if (currentMode === 'familyToName' || currentMode === 'wordMatch') {
-        candidatePool = familyData.map(d => d.name);
+      if (game1Mode === 'familyToName') {
+        promptEl.innerText = `${g1Target.role}의 이름은 무엇일까요?`;
+        wordEl.innerText = g1Target.role;
+        g1Answer = g1Target.name;
+        currentVoiceText = `${g1Target.role}! ${g1Target.role}의 이름은 무엇일까요?`;
+      } else if (game1Mode === 'nameToFamily') {
+        promptEl.innerText = `${g1Target.name}은(는) 누구일까요?`;
+        wordEl.innerText = g1Target.name;
+        g1Answer = g1Target.role;
+        currentVoiceText = `${g1Target.name}! 누구일까요?`;
       } else {
-        candidatePool = familyData.map(d => d.role);
+        promptEl.innerText = `똑같은 글자를 찾아보세요!`;
+        wordEl.innerText = g1Target.name;
+        g1Answer = g1Target.name;
+        currentVoiceText = `${g1Target.name}! 똑같은 글자를 찾아보세요!`;
       }
 
-      const incorrectChoices = candidatePool.filter(c => c !== answerText);
-      shuffleArray(incorrectChoices);
-      const options = [answerText, incorrectChoices[0], incorrectChoices[1]];
-      if (incorrectChoices[2]) {
-        options.push(incorrectChoices[2]);
-      }
-      shuffleArray(options);
+      let pool = (game1Mode === 'nameToFamily') ? familyData.map(d => d.role) : familyData.map(d => d.name);
+      let choices = pool.filter(c => c !== g1Answer);
+      shuffleArray(choices);
+      let finalOptions = [g1Answer, choices[0], choices[1]];
+      if (choices[2]) finalOptions.push(choices[2]);
+      shuffleArray(finalOptions);
 
-      options.forEach(optText => {
+      finalOptions.forEach(text => {
         const btn = document.createElement('button');
         btn.className = 'option-btn';
-        btn.innerText = optText;
-        btn.onclick = () => handleChoice(optText, btn);
-        optionsGrid.appendChild(btn);
+        btn.innerText = text;
+        btn.onclick = () => handleGame1Choice(text, btn);
+        optContainer.appendChild(btn);
       });
 
-      speakText(promptVoice);
+      speakCurrent();
     }
 
-    function speakCurrentQuestion() {
-      if (currentQuestion && currentQuestion.voiceText) {
-        speakText(currentQuestion.voiceText);
-      }
-    }
-
-    function handleChoice(selectedText, btnEl) {
+    function handleGame1Choice(selectedText, btnEl) {
       if (isProcessing) return;
-
-      if (selectedText === currentQuestion.correctAnswer) {
-        // 정답
+      if (selectedText === g1Answer) {
         isProcessing = true;
         playSound('correct');
         starsCount++;
         updateStars();
-
         btnEl.style.background = '#C6F6D5';
-        btnEl.style.borderColor = '#38A169';
 
-        const praises = [
-          '정답이에요! 참 잘했어요!',
-          '우와! 우리 윤슬이 최고!',
-          '맞았어요! 멋쟁이 윤슬이!',
-          '딩동댕! 아주 잘했어요!'
-        ];
-        const celebrationVoice = praises[Math.floor(Math.random() * praises.length)];
-        const emojis = ['🌟', '💖', '🎉', '👏', '🥳', '🎈'];
-        const chosenEmoji = emojis[Math.floor(Math.random() * emojis.length)];
-
-        document.getElementById('celebrationEmoji').innerText = chosenEmoji;
-        document.getElementById('celebrationText').innerText = celebrationVoice;
-        document.getElementById('celebrationOverlay').style.display = 'flex';
-
-        speakText(`${selectedText}! ${celebrationVoice}`);
-
-        setTimeout(() => {
-          nextRound();
-        }, 1800);
+        celebrateSuccess(selectedText, () => nextRoundGame1());
       } else {
-        // 오답
         playSound('wrong');
-        btnEl.classList.add('wrong-flash');
         btnEl.style.background = '#FED7D7';
-        btnEl.style.borderColor = '#E53E3E';
-
-        speakText(`괜찮아요, 다시 한번 찾아볼까요?`);
-
+        speakText('괜찮아요, 다시 한번 찾아볼까요?');
         setTimeout(() => {
-          btnEl.classList.remove('wrong-flash');
           btnEl.style.background = '#FFFFFF';
-          btnEl.style.borderColor = '#6BCB77';
-        }, 600);
+        }, 500);
       }
+    }
+
+    /* =================== 게임 2: 섞인 글자 모아 완성하기 로직 =================== */
+    function nextRoundGame2() {
+      isProcessing = false;
+      document.getElementById('celebrationOverlay').style.display = 'none';
+
+      puzzleTarget = familyData[Math.floor(Math.random() * familyData.length)];
+      puzzleFilledCount = 0;
+
+      document.getElementById('g2-icon').innerText = puzzleTarget.icon;
+      document.getElementById('g2-prompt').innerText = `${puzzleTarget.role} 이름을 순서대로 맞춰보세요!`;
+      document.getElementById('g2-target-name').innerText = `${puzzleTarget.role} ➔ ${puzzleTarget.name}`;
+
+      currentVoiceText = `${puzzleTarget.role} 이름을 찾아보자! ${puzzleTarget.name}! 첫 번째 글자는 무엇일까요?`;
+
+      // 슬롯 생성 (예: 남 호 정 -> 3개 슬롯)
+      const slotsContainer = document.getElementById('g2-slots');
+      slotsContainer.innerHTML = '';
+      for (let i = 0; i < puzzleTarget.name.length; i++) {
+        const slot = document.createElement('div');
+        slot.className = 'slot-box';
+        slot.id = `slot-${i}`;
+        slot.innerText = (i === 0) ? '?' : '';
+        slotsContainer.appendChild(slot);
+      }
+
+      // 섞인 글자 바구니 생성
+      const basket = document.getElementById('g2-basket');
+      basket.innerHTML = '';
+
+      // 정답 글자들 + 다른 가족의 섞인 글자들로 6~7개 구성
+      let targetChars = puzzleTarget.name.split('');
+      let extraChars = allFamilyChars.filter(c => !targetChars.includes(c));
+      shuffleArray(extraChars);
+
+      let basketChars = [...targetChars, ...extraChars.slice(0, 3)];
+      shuffleArray(basketChars);
+
+      basketChars.forEach((ch, idx) => {
+        const block = createLetterDragBlock(ch, `letter-${idx}`);
+        basket.appendChild(block);
+      });
+
+      speakCurrent();
+    }
+
+    function createLetterDragBlock(charText, id) {
+      const block = document.createElement('div');
+      block.className = 'letter-block';
+      block.id = id;
+      block.innerText = charText;
+      block.dataset.char = charText;
+
+      let isDragging = false;
+      let startX = 0, startY = 0;
+      let hasMoved = false;
+
+      // PointerDown
+      block.onpointerdown = (e) => {
+        if (isProcessing) return;
+        isDragging = true;
+        hasMoved = false;
+        block.setPointerCapture(e.pointerId);
+
+        startX = e.clientX;
+        startY = e.clientY;
+
+        block.classList.add('dragging');
+        block.style.position = 'relative';
+        block.style.zIndex = 1000;
+        speakText(charText);
+      };
+
+      // PointerMove
+      block.onpointermove = (e) => {
+        if (!isDragging) return;
+        const dx = e.clientX - startX;
+        const dy = e.clientY - startY;
+        if (Math.abs(dx) > 5 || Math.abs(dy) > 5) {
+          hasMoved = true;
+        }
+        block.style.transform = `translate(${dx}px, ${dy}px) scale(1.15)`;
+
+        // 현재 채워야 할 타겟 슬롯 체크
+        const currentSlot = document.getElementById(`slot-${puzzleFilledCount}`);
+        if (currentSlot) {
+          const rect = currentSlot.getBoundingClientRect();
+          if (
+            e.clientX >= rect.left && e.clientX <= rect.right &&
+            e.clientY >= rect.top && e.clientY <= rect.bottom
+          ) {
+            currentSlot.classList.add('drag-over');
+          } else {
+            currentSlot.classList.remove('drag-over');
+          }
+        }
+      };
+
+      // PointerUp
+      block.onpointerup = (e) => {
+        if (!isDragging) return;
+        isDragging = false;
+        block.releasePointerCapture(e.pointerId);
+        block.classList.remove('dragging');
+
+        const currentSlot = document.getElementById(`slot-${puzzleFilledCount}`);
+        let droppedOnTarget = false;
+
+        if (currentSlot) {
+          currentSlot.classList.remove('drag-over');
+          const rect = currentSlot.getBoundingClientRect();
+          droppedOnTarget = (
+            e.clientX >= rect.left - 25 && e.clientX <= rect.right + 25 &&
+            e.clientY >= rect.top - 25 && e.clientY <= rect.bottom + 25
+          );
+        }
+
+        // 아이가 드래그를 어려워할 수 있으므로, 그냥 '클릭'만 해도 슬롯에 맞출 수 있도록 배려
+        if (droppedOnTarget || !hasMoved) {
+          attemptFillSlot(charText, block);
+        } else {
+          // 제자리로 복귀
+          resetBlockPos(block);
+        }
+      };
+
+      block.onpointercancel = () => {
+        isDragging = false;
+        block.classList.remove('dragging');
+        resetBlockPos(block);
+      };
+
+      return block;
+    }
+
+    function resetBlockPos(block) {
+      block.style.transition = 'transform 0.2s ease';
+      block.style.transform = 'translate(0px, 0px)';
+      setTimeout(() => {
+        block.style.transition = '';
+        block.style.position = '';
+        block.style.zIndex = '';
+      }, 200);
+    }
+
+    function attemptFillSlot(charText, blockEl) {
+      const neededChar = puzzleTarget.name[puzzleFilledCount];
+
+      if (charText === neededChar) {
+        // 일치! 슬롯에 쏙 들어감
+        playSound('pop');
+        const slot = document.getElementById(`slot-${puzzleFilledCount}`);
+        slot.innerText = charText;
+        slot.classList.add('filled');
+        blockEl.style.visibility = 'hidden';
+
+        puzzleFilledCount++;
+
+        // 아직 채울 글자가 남았을 때
+        if (puzzleFilledCount < puzzleTarget.name.length) {
+          const nextSlot = document.getElementById(`slot-${puzzleFilledCount}`);
+          if (nextSlot) nextSlot.innerText = '?';
+          const nextChar = puzzleTarget.name[puzzleFilledCount];
+          speakText(`잘했어요! 다음 글자는 무엇일까요?`);
+        } else {
+          // 전체 이름 완성!
+          isProcessing = true;
+          playSound('correct');
+          starsCount++;
+          updateStars();
+
+          celebrateSuccess(puzzleTarget.name, () => nextRoundGame2());
+        }
+      } else {
+        // 순서가 아니거나 다른 글자일 때
+        playSound('wrong');
+        resetBlockPos(blockEl);
+
+        const currentSlot = document.getElementById(`slot-${puzzleFilledCount}`);
+        if (currentSlot) currentSlot.classList.add('shake-anim');
+        setTimeout(() => {
+          if (currentSlot) currentSlot.classList.remove('shake-anim');
+        }, 400);
+
+        speakText(`아직 그 글자가 아니에요. ${neededChar} 글자를 찾아볼까요?`);
+      }
+    }
+
+    /* =================== 공통 칭찬 피드백 =================== */
+    function celebrateSuccess(word, callback) {
+      const praises = [
+        '정답이에요! 참 잘했어요!',
+        '우와! 우리 윤슬이 최고!',
+        '맞았어요! 멋쟁이 윤슬이!',
+        '딩동댕! 아주 잘했어요!'
+      ];
+      const celebrationVoice = praises[Math.floor(Math.random() * praises.length)];
+      const emojis = ['🌟', '💖', '🎉', '👏', '🥳', '🎈'];
+      const chosenEmoji = emojis[Math.floor(Math.random() * emojis.length)];
+
+      document.getElementById('celebrationEmoji').innerText = chosenEmoji;
+      document.getElementById('celebrationText').innerText = celebrationVoice;
+      document.getElementById('celebrationOverlay').style.display = 'flex';
+
+      speakText(`${word}! ${celebrationVoice}`);
+
+      setTimeout(() => {
+        callback();
+      }, 1800);
     }
 
     function updateStars() {
       let starStr = `⭐ 별 모으기: ${starsCount}개 (`;
       const displayStars = Math.min(starsCount, 8);
-      for (let i = 0; i < displayStars; i++) {
-        starStr += '⭐';
-      }
+      for (let i = 0; i < displayStars; i++) starStr += '⭐';
       starStr += ')';
       document.getElementById('starDisplay').innerText = starStr;
     }
@@ -493,7 +823,7 @@
     }
 
     window.addEventListener('load', () => {
-      nextRound();
+      switchMainGame('click');
     });
   </script>
 </body>
