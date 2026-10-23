@@ -103,8 +103,8 @@
       position: relative;
       width: 100%;
       max-width: 680px;
-      height: 250px;
-      margin: 12px auto;
+      height: 270px;
+      margin: 10px auto;
       background: #FFFFFF;
       border: 4px solid #48BB78;
       border-radius: 28px;
@@ -114,10 +114,11 @@
       align-items: center;
       justify-content: center;
       overflow: hidden;
-      padding: 0 10px;
+      padding: 0 4px;
+      box-sizing: border-box;
     }
 
-    /* 흐릿하게 보이는 가이드 글씨: 핸드폰에서도 경계를 벗어나지 않는 반응형 크기! */
+    /* 흐릿하게 보이는 가이드 글씨: 박스 선 안에 안 넘치면서 꽉 차는 최적 크기! */
     .trace-guide-text {
       position: absolute;
       top: 0;
@@ -127,16 +128,17 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: clamp(3.2rem, 16vw, 6.8rem); /* 모바일 화면 폭에 맞춰 쏙 들어감 */
+      font-size: clamp(4.8rem, 24vw, 8.4rem); /* 모바일 화면 폭에 맞춰 선 안에 꽉 차게 큼직! */
       font-weight: 900;
-      color: rgba(160, 174, 192, 0.4); /* 연한 회색 가이드 */
-      letter-spacing: clamp(4px, 2vw, 14px);
+      color: rgba(160, 174, 192, 0.42); /* 연한 회색 가이드 */
+      letter-spacing: clamp(1px, 1.2vw, 8px);
       pointer-events: none;
       user-select: none;
       font-family: 'Jua', sans-serif;
       text-shadow: 0 0 3px rgba(0,0,0,0.08);
       white-space: nowrap;
       text-align: center;
+      line-height: 1;
     }
 
     .trace-canvas {
@@ -476,7 +478,7 @@
       </div>
 
       <div class="quiz-card">
-        <div class="avatar-icon" id="g1-icon">👩</div>
+        <div class="avatar-icon" id="g1-icon">👩🏻‍🦰</div>
         <div class="prompt-label" id="g1-prompt">엄마의 이름은 무엇일까요?</div>
         <div class="target-word" id="g1-word">엄마</div>
         <br>
@@ -491,7 +493,7 @@
     <!-- ======================= 2. 섞인 글자 순서대로 끌어오기 게임 뷰 ======================= -->
     <div id="view-game2" style="display: none;">
       <div class="game2-card">
-        <div class="avatar-icon" id="g2-icon">👩</div>
+        <div class="avatar-icon" id="g2-icon">👩🏻‍🦰</div>
         <div class="prompt-label" id="g2-prompt">엄마 이름을 순서대로 끌어와서 맞춰보세요!</div>
         <div class="target-word" id="g2-target-name">엄마</div>
 
@@ -513,7 +515,7 @@
     <!-- ======================= 3. 글씨 따라쓰기 게임 뷰 ======================= -->
     <div id="view-game3" style="display: none;">
       <div class="game3-card">
-        <div class="avatar-icon" id="g3-icon">👩</div>
+        <div class="avatar-icon" id="g3-icon">👩🏻‍🦰</div>
         <div class="prompt-label" id="g3-prompt">엄마 이름은 무엇일까요? 글씨를 따라 써봐요!</div>
         
         <!-- 캔버스 및 흐린 글자 영역 -->
@@ -548,10 +550,10 @@
   </div>
 
   <script>
-    // 가족 데이터 (윤슬이는 호칭: '나', 5살 남아 🧒)
+    // 가족 데이터 (엄마는 젊고 예쁜 긴머리 👩🏻‍🦰, 윤슬이는 호칭: '나', 5살 남아 🧒)
     // 순서: 엄마 -> 형아 -> 아빠 -> 나 (윤슬)
     const familyData = [
-      { role: '엄마', name: '남호정', icon: '👩' },
+      { role: '엄마', name: '남호정', icon: '👩🏻‍🦰' },
       { role: '형아', name: '윤호',   icon: '👦' },
       { role: '아빠', name: '윤태환', icon: '👨' },
       { role: '나',   name: '윤슬',   icon: '🧒' }
