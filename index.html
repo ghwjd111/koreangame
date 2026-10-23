@@ -449,93 +449,50 @@
       return audioCtx;
     }
 
+    // 사용자 요청: 기계음/실로폰 효과음은 완전히 끄고, 오직 한글 목소리(TTS)로만 읽어줌!
     function playSound(type) {
-      try {
-        const ctx = getAudioContext();
-        if (type === 'correct') {
-          const notes = [523.25, 659.25, 783.99, 1046.50];
-          notes.forEach((freq, idx) => {
-            const o = ctx.createOscillator();
-            const g = ctx.createGain();
-            o.type = 'triangle';
-            o.frequency.setValueAtTime(freq, ctx.currentTime + idx * 0.1);
-            g.gain.setValueAtTime(0.35, ctx.currentTime + idx * 0.1);
-            g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + idx * 0.1 + 0.25);
-            o.connect(g);
-            g.connect(ctx.destination);
-            o.start(ctx.currentTime + idx * 0.1);
-            o.stop(ctx.currentTime + idx * 0.1 + 0.3);
-          });
-        } else if (type === 'pop') {
-          const o = ctx.createOscillator();
-          const g = ctx.createGain();
-          o.type = 'sine';
-          o.frequency.setValueAtTime(450, ctx.currentTime);
-          o.frequency.exponentialRampToValueAtTime(800, ctx.currentTime + 0.12);
-          g.gain.setValueAtTime(0.3, ctx.currentTime);
-          g.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.12);
-          o.connect(g);
-          g.connect(ctx.destination);
-          o.start(ctx.currentTime);
-          o.stop(ctx.currentTime + 0.12);
-        } else if (type === 'wrong') {
-          const o = ctx.createOscillator();
-          const g = ctx.createGain();
-          o.type = 'sawtooth';
-          o.frequency.setValueAtTime(220, ctx.currentTime);
-          o.frequency.linearRampToValueAtTime(140, ctx.currentTime + 0.22);
-          g.gain.setValueAtTime(0.2, ctx.currentTime);
-          g.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.22);
-          o.connect(g);
-          g.connect(ctx.destination);
-          o.start(ctx.currentTime);
-          o.stop(ctx.currentTime + 0.22);
-        }
-      } catch (e) {
-        console.warn('Audio error:', e);
-      }
+      // 효과음 없음
     }
 
-    // 한국어 음성 목록 캐싱 (브라우저가 준비될 때 로드)
+    // 한국어 음성 목록 로드
     let koreanVoice = null;
-    function loadVoices() {
+    function updateKoreanVoice() {
       if ('speechSynthesis' in window) {
         const voices = window.speechSynthesis.getVoices();
-        koreanVoice = voices.find(v => v.lang === 'ko-KR' || v.lang.startsWith('ko')) || null;
+        // 한국어 음성 우선 탐색
+        koreanVoice = voices.find(v => v.lang === 'ko-KR' || v.lang === 'ko_KR' || v.lang.startsWith('ko')) || null;
       }
     }
+
     if ('speechSynthesis' in window) {
-      window.speechSynthesis.onvoiceschanged = loadVoices;
-      loadVoices();
+      updateKoreanVoice();
+      window.speechSynthesis.onvoiceschanged = updateKoreanVoice;
     }
 
-    // 아이 목소리 톤 (밝고 맑은 높은 피치: pitch 1.35, rate 0.95)
+    // 아이 목소리 톤으로 또박또박 한글 읽어주기
     function speakChildVoice(text, onEnd) {
       if (!('speechSynthesis' in window)) return;
       try {
-        // 브라우저 AudioContext 깨우기
-        getAudioContext();
+        updateKoreanVoice();
+        window.speechSynthesis.cancel(); // 이전 소리 즉시 중단
 
-        // 중복 취소 후 안전 발화
-        window.speechSynthesis.cancel();
-
-        const utterance = new SpeechSynthesisUtterance(text);
+        const utterance = new SpeechSynthesisUtterance(String(text));
         utterance.lang = 'ko-KR';
-        if (koreanVoice) utterance.voice = koreanVoice;
-        utterance.pitch = 1.35; // 아이 톤 (호환성 있는 1.35)
-        utterance.rate = 0.95;   // 또박또박한 속도
+        if (koreanVoice) {
+          utterance.voice = koreanVoice;
+        }
+        utterance.pitch = 1.3; // 아이 목소리 톤
+        utterance.rate = 0.9;  // 또박또박 천천히
         utterance.volume = 1.0;
 
         if (onEnd) utterance.onend = onEnd;
 
-        // 크롬 브라우저 음성 엔진 pause 버그 방지
+        // 크롬 음성 엔진 버그 방지
         if (window.speechSynthesis.paused) {
           window.speechSynthesis.resume();
         }
 
-        setTimeout(() => {
-          window.speechSynthesis.speak(utterance);
-        }, 30);
+        window.speechSynthesis.speak(utterance);
       } catch (e) {
         console.warn('TTS error:', e);
       }
