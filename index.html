@@ -382,7 +382,7 @@
       <div class="game2-card">
         <div class="avatar-icon" id="g2-icon">👩</div>
         <div class="prompt-label" id="g2-prompt">엄마 이름을 순서대로 끌어와서 맞춰보세요!</div>
-        <div class="target-word" id="g2-target-name">엄마 (남호정)</div>
+        <div class="target-word" id="g2-target-name">엄마</div>
 
         <!-- 완성 글자 슬롯 영역 (예: [남] [ ] [ ]) -->
         <div class="slots-container" id="g2-slots">
@@ -412,15 +412,16 @@
   </div>
 
   <script>
-    // 가족 데이터 (윤슬이는 5살 남아 🧒)
+    // 가족 데이터 (윤슬이는 호칭: '나', 5살 남아 🧒)
+    // 순서: 엄마 -> 형아 -> 아빠 -> 나 (윤슬)
     const familyData = [
       { role: '엄마', name: '남호정', icon: '👩' },
-      { role: '아빠', name: '윤태환', icon: '👨' },
       { role: '형아', name: '윤호',   icon: '👦' },
-      { role: '윤슬', name: '윤슬',   icon: '🧒' }
+      { role: '아빠', name: '윤태환', icon: '👨' },
+      { role: '나',   name: '윤슬',   icon: '🧒' }
     ];
 
-    // 가족 글자 풀 (남, 호, 정, 윤, 태, 환, 호, 슬)
+    // 가족 글자 풀 (남, 호, 정, 윤, 태, 환, 슬)
     const allFamilyChars = ['남', '호', '정', '윤', '태', '환', '슬'];
 
     let currentMainGame = 'click'; // 'click' | 'puzzle'
@@ -428,6 +429,9 @@
     let starsCount = 0;
     let isProcessing = false;
     let currentVoiceText = '';
+
+    // 글자모아 완성하기 순환 인덱스
+    let puzzleTurnIndex = 0;
 
     // 게임 2(퍼즐) 상태 변수
     let puzzleTarget = null; // { role, name, icon }
@@ -601,14 +605,20 @@
       isProcessing = false;
       document.getElementById('celebrationOverlay').style.display = 'none';
 
-      puzzleTarget = familyData[Math.floor(Math.random() * familyData.length)];
+      // 엄마 -> 형아 -> 아빠 -> 나 순환
+      puzzleTarget = familyData[puzzleTurnIndex % familyData.length];
+      puzzleTurnIndex++;
       puzzleFilledCount = 0;
 
       document.getElementById('g2-icon').innerText = puzzleTarget.icon;
-      document.getElementById('g2-prompt').innerText = `${puzzleTarget.role} 이름을 순서대로 맞춰보세요!`;
-      document.getElementById('g2-target-name').innerText = `${puzzleTarget.role} ➔ ${puzzleTarget.name}`;
+      
+      const roleText = (puzzleTarget.role === '나') ? '내' : `${puzzleTarget.role}`;
+      document.getElementById('g2-prompt').innerText = `${roleText} 이름을 순서대로 맞춰보세요!`;
+      // 화면에 이름 예시를 보여주지 않고 호칭만 표시하여 스스로 맞추도록 함
+      document.getElementById('g2-target-name').innerText = (puzzleTarget.role === '나') ? '나 (윤슬)' : puzzleTarget.role;
 
-      currentVoiceText = `${puzzleTarget.role} 이름을 찾아보자! ${puzzleTarget.name}! 첫 번째 글자는 무엇일까요?`;
+      // 음성에서도 이름 정답을 직접 말해주지 않고 스스로 찾도록 안내
+      currentVoiceText = `${roleText} 이름을 순서대로 맞춰보세요!`;
 
       // 슬롯 생성 (예: 남 호 정 -> 3개 슬롯)
       const slotsContainer = document.getElementById('g2-slots');
@@ -779,7 +789,7 @@
           if (currentSlot) currentSlot.classList.remove('shake-anim');
         }, 400);
 
-        speakText(`아직 그 글자가 아니에요. ${neededChar} 글자를 찾아볼까요?`);
+        speakText('어라? 그 글자가 아닌 것 같아요. 다시 한번 찾아볼까요?');
       }
     }
 
