@@ -454,48 +454,65 @@
       // 효과음 없음
     }
 
-    // 한국어 음성 목록 로드
-    let koreanVoice = null;
-    function updateKoreanVoice() {
-      if ('speechSynthesis' in window) {
-        const voices = window.speechSynthesis.getVoices();
-        // 한국어 음성 우선 탐색
-        koreanVoice = voices.find(v => v.lang === 'ko-KR' || v.lang === 'ko_KR' || v.lang.startsWith('ko')) || null;
-      }
+    // Windows/Chrome 침묵 버그 방지: 전역 변수로 utterance 참조를 유지해야 가비지 컬렉션(GC)에 의해 소리가 끊기지 않습니다.
+    let globalUtterance = null;
+    let speakTimer = null;
+
+    // 한국어 음성 탐색
+    function getKoreanVoice() {
+      if (!('speechSynthesis' in window)) return null;
+      const voices = window.speechSynthesis.getVoices();
+      return voices.find(v => v.lang === 'ko-KR' || v.lang === 'ko_KR' || v.lang.startsWith('ko')) || null;
     }
 
     if ('speechSynthesis' in window) {
-      updateKoreanVoice();
-      window.speechSynthesis.onvoiceschanged = updateKoreanVoice;
+      window.speechSynthesis.onvoiceschanged = () => {
+        getKoreanVoice();
+      };
     }
 
     // 아이 목소리 톤으로 또박또박 한글 읽어주기
     function speakChildVoice(text, onEnd) {
       if (!('speechSynthesis' in window)) return;
+      
+      clearTimeout(speakTimer);
+
       try {
-        updateKoreanVoice();
-        window.speechSynthesis.cancel(); // 이전 소리 즉시 중단
-
-        const utterance = new SpeechSynthesisUtterance(String(text));
-        utterance.lang = 'ko-KR';
-        if (koreanVoice) {
-          utterance.voice = koreanVoice;
-        }
-        utterance.pitch = 1.3; // 아이 목소리 톤
-        utterance.rate = 0.9;  // 또박또박 천천히
-        utterance.volume = 1.0;
-
-        if (onEnd) utterance.onend = onEnd;
-
-        // 크롬 음성 엔진 버그 방지
+        // 크롬 음성 엔진 멈춤 상태 해제
         if (window.speechSynthesis.paused) {
           window.speechSynthesis.resume();
         }
-
-        window.speechSynthesis.speak(utterance);
+        window.speechSynthesis.cancel(); // 이전 큐 비우기
       } catch (e) {
-        console.warn('TTS error:', e);
+        console.warn(e);
       }
+
+      // Windows Chrome에서는 cancel() 직후 바로 speak()를 부르면 무음이 되는 버그가 있어 50ms 후 재생
+      speakTimer = setTimeout(() => {
+        try {
+          const targetVoice = getKoreanVoice();
+          globalUtterance = new SpeechSynthesisUtterance(String(text));
+          globalUtterance.lang = 'ko-KR';
+          if (targetVoice) {
+            globalUtterance.voice = targetVoice;
+          }
+          globalUtterance.pitch = 1.35; // 아이 목소리 톤
+          globalUtterance.rate = 0.95;   // 또박또박 속도
+          globalUtterance.volume = 1.0;
+
+          globalUtterance.onend = () => {
+            if (onEnd) onEnd();
+          };
+
+          globalUtterance.onerror = (err) => {
+            console.warn('Speech error:', err);
+          };
+
+          window.speechSynthesis.speak(globalUtterance);
+        } catch (err) {
+          console.warn('TTS speak failed:', err);
+        }
+      }, 50);
     }
 
     function speakText(text, onEnd) {
