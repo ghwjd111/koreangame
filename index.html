@@ -977,15 +977,19 @@
       if (el) el.classList.add('active');
     }
 
+    let traceStrokePoints = 0; // 아이가 실제로 따라 쓴 획/포인트 수
+
     function clearTraceCanvas() {
       if (traceCtx && traceCanvas) {
         traceCtx.clearRect(0, 0, traceCanvas.width, traceCanvas.height);
       }
+      traceStrokePoints = 0;
     }
 
     function startDraw(e) {
       if (isProcessing) return;
       isDrawing = true;
+      traceStrokePoints += 5; // 점 하나 찍기 카운트
       traceCanvas.setPointerCapture(e.pointerId);
 
       const rect = traceCanvas.getBoundingClientRect();
@@ -1005,6 +1009,8 @@
 
     function drawMove(e) {
       if (!isDrawing) return;
+      traceStrokePoints++; // 선 긋기 카운트 증가
+
       const rect = traceCanvas.getBoundingClientRect();
       const x = (e.clientX - rect.left) * (traceCanvas.width / rect.width);
       const y = (e.clientY - rect.top) * (traceCanvas.height / rect.height);
@@ -1045,6 +1051,19 @@
 
     function finishTracing() {
       if (isProcessing) return;
+
+      // 최소 획수 검증: 아예 안 쓰거나 점 몇 개만 찍고 누른 경우 방지 (최소 30포인트 이상 그려야 인정)
+      if (traceStrokePoints < 30) {
+        playSound('wrong');
+        const container = document.getElementById('traceContainer');
+        if (container) {
+          container.classList.add('shake-anim');
+          setTimeout(() => container.classList.remove('shake-anim'), 400);
+        }
+        speakText('글씨를 쓱싹쓱싹 따라 써보고 다시 눌러주세요!');
+        return;
+      }
+
       isProcessing = true;
 
       // 축하 실로폰 소리 & 별점
