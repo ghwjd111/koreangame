@@ -118,7 +118,7 @@
       box-sizing: border-box;
     }
 
-    /* 흐릿하게 보이는 가이드 글씨: 박스 선 안에 안 넘치면서 꽉 차는 최적 크기! */
+    /* 흐릿하게 보이는 가이드 글씨: 박스 선 안에 안 넘치면서 위아래로 꽉 차게 위아래 늘림! */
     .trace-guide-text {
       position: absolute;
       top: 0;
@@ -128,7 +128,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: clamp(4.8rem, 24vw, 8.4rem); /* 모바일 화면 폭에 맞춰 선 안에 꽉 차게 큼직! */
+      font-size: clamp(5.2rem, 25vw, 8.8rem); /* 폰트 기본 크기 추가 확대 */
       font-weight: 900;
       color: rgba(160, 174, 192, 0.42); /* 연한 회색 가이드 */
       letter-spacing: clamp(1px, 1.2vw, 8px);
@@ -139,6 +139,8 @@
       white-space: nowrap;
       text-align: center;
       line-height: 1;
+      transform: scaleY(1.35); /* 위아래로 1.35배 늘려서 박스 높이에 시원하게 꽉 채움! */
+      transform-origin: center center;
     }
 
     .trace-canvas {
