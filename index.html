@@ -437,86 +437,60 @@
     let puzzleTarget = null; // { role, name, icon }
     let puzzleFilledCount = 0; // 몇 번째 글자까지 채웠는지
 
-    // 사운드 및 브라우저 AudioContext 안전 초기화
-    let audioCtx = null;
-    function getAudioContext() {
-      if (!audioCtx) {
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      }
-      if (audioCtx.state === 'suspended') {
-        audioCtx.resume();
-      }
-      return audioCtx;
-    }
-
-    // 사용자 요청: 기계음/실로폰 효과음은 완전히 끄고, 오직 한글 목소리(TTS)로만 읽어줌!
+    // 사운드
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     function playSound(type) {
-      // 효과음 없음
-    }
-
-    // Windows/Chrome 침묵 버그 방지: 전역 변수로 utterance 참조를 유지해야 가비지 컬렉션(GC)에 의해 소리가 끊기지 않습니다.
-    let globalUtterance = null;
-    let speakTimer = null;
-
-    // 한국어 음성 탐색
-    function getKoreanVoice() {
-      if (!('speechSynthesis' in window)) return null;
-      const voices = window.speechSynthesis.getVoices();
-      return voices.find(v => v.lang === 'ko-KR' || v.lang === 'ko_KR' || v.lang.startsWith('ko')) || null;
-    }
-
-    if ('speechSynthesis' in window) {
-      window.speechSynthesis.onvoiceschanged = () => {
-        getKoreanVoice();
-      };
-    }
-
-    // 아이 목소리 톤으로 또박또박 한글 읽어주기
-    function speakChildVoice(text, onEnd) {
-      if (!('speechSynthesis' in window)) return;
-      
-      clearTimeout(speakTimer);
-
-      try {
-        // 크롬 음성 엔진 멈춤 상태 해제
-        if (window.speechSynthesis.paused) {
-          window.speechSynthesis.resume();
-        }
-        window.speechSynthesis.cancel(); // 이전 큐 비우기
-      } catch (e) {
-        console.warn(e);
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      if (type === 'correct') {
+        const notes = [523.25, 659.25, 783.99, 1046.50];
+        notes.forEach((freq, idx) => {
+          const o = audioCtx.createOscillator();
+          const g = audioCtx.createGain();
+          o.type = 'triangle';
+          o.frequency.setValueAtTime(freq, audioCtx.currentTime + idx * 0.1);
+          g.gain.setValueAtTime(0.3, audioCtx.currentTime + idx * 0.1);
+          g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + idx * 0.1 + 0.25);
+          o.connect(g);
+          g.connect(audioCtx.destination);
+          o.start(audioCtx.currentTime + idx * 0.1);
+          o.stop(audioCtx.currentTime + idx * 0.1 + 0.3);
+        });
+      } else if (type === 'wrong') {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(220, audioCtx.currentTime);
+        osc.frequency.linearRampToValueAtTime(140, audioCtx.currentTime + 0.25);
+        gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.25);
+        osc.start(audioCtx.currentTime);
+        osc.stop(audioCtx.currentTime + 0.25);
+      } else if (type === 'pop') {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(440, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.1);
+        gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+        osc.start(audioCtx.currentTime);
+        osc.stop(audioCtx.currentTime + 0.1);
       }
-
-      // Windows Chrome에서는 cancel() 직후 바로 speak()를 부르면 무음이 되는 버그가 있어 50ms 후 재생
-      speakTimer = setTimeout(() => {
-        try {
-          const targetVoice = getKoreanVoice();
-          globalUtterance = new SpeechSynthesisUtterance(String(text));
-          globalUtterance.lang = 'ko-KR';
-          if (targetVoice) {
-            globalUtterance.voice = targetVoice;
-          }
-          globalUtterance.pitch = 1.35; // 아이 목소리 톤
-          globalUtterance.rate = 0.95;   // 또박또박 속도
-          globalUtterance.volume = 1.0;
-
-          globalUtterance.onend = () => {
-            if (onEnd) onEnd();
-          };
-
-          globalUtterance.onerror = (err) => {
-            console.warn('Speech error:', err);
-          };
-
-          window.speechSynthesis.speak(globalUtterance);
-        } catch (err) {
-          console.warn('TTS speak failed:', err);
-        }
-      }, 50);
     }
 
-    function speakText(text, onEnd) {
-      speakChildVoice(text, onEnd);
+    function speakText(text) {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'ko-KR';
+        utterance.rate = 0.85;
+        utterance.pitch = 1.2;
+        window.speechSynthesis.speak(utterance);
+      }
     }
 
     function speakCurrent() {
@@ -610,25 +584,19 @@
       if (isProcessing) return;
       if (selectedText === g1Answer) {
         isProcessing = true;
-        // 효과음 + 글자 읽어주기 동시 재생
         playSound('correct');
-        speakText(selectedText);
-
         starsCount++;
         updateStars();
         btnEl.style.background = '#C6F6D5';
 
-        setTimeout(() => {
-          celebrateSuccess(selectedText, () => nextRoundGame1());
-        }, 1000);
+        celebrateSuccess(selectedText, () => nextRoundGame1());
       } else {
         playSound('wrong');
         btnEl.style.background = '#FED7D7';
-        // 고른 한글 읽어준 뒤 다시 찾아보게 안내
-        speakText(`${selectedText}! 다시 한번 찾아볼까요?`);
+        speakText('괜찮아요, 다시 한번 찾아볼까요?');
         setTimeout(() => {
           btnEl.style.background = '#FFFFFF';
-        }, 600);
+        }, 500);
       }
     }
 
@@ -786,10 +754,8 @@
       const neededChar = puzzleTarget.name[puzzleFilledCount];
 
       if (charText === neededChar) {
-        // 일치! 실로폰 통통 소리와 함께 한글 글자 음성 읽어주기
+        // 일치! 슬롯에 쏙 들어감
         playSound('pop');
-        speakText(charText);
-
         const slot = document.getElementById(`slot-${puzzleFilledCount}`);
         slot.innerText = charText;
         slot.classList.add('filled');
@@ -801,21 +767,22 @@
         if (puzzleFilledCount < puzzleTarget.name.length) {
           const nextSlot = document.getElementById(`slot-${puzzleFilledCount}`);
           if (nextSlot) nextSlot.innerText = '?';
+          const nextChar = puzzleTarget.name[puzzleFilledCount];
+          speakText(`잘했어요! 다음 글자는 무엇일까요?`);
         } else {
           // 전체 이름 완성!
           isProcessing = true;
-          // 이름 완성 축하 실로폰 소리!
           playSound('correct');
           starsCount++;
           updateStars();
 
-          // 1초 뒤 칭찬 화면 등장
+          // 완성된 글자를 1초 동안 기분 좋게 확인한 뒤 칭찬 화면 등장!
           setTimeout(() => {
             celebrateSuccess(puzzleTarget.name, () => nextRoundGame2());
           }, 1000);
         }
       } else {
-        // 틀렸을 때 통! 소리와 함께 고른 글자 발음
+        // 순서가 아니거나 다른 글자일 때
         playSound('wrong');
         resetBlockPos(blockEl);
 
@@ -825,37 +792,31 @@
           if (currentSlot) currentSlot.classList.remove('shake-anim');
         }, 400);
 
-        speakText(`${charText}! 다른 글자를 찾아볼까요?`);
+        speakText('어라? 그 글자가 아닌 것 같아요. 다시 한번 찾아볼까요?');
       }
     }
 
     /* =================== 공통 칭찬 피드백 =================== */
     function celebrateSuccess(word, callback) {
-      // 칭찬 화면 뜰 때도 신나는 축하 멜로디 울림!
-      playSound('correct');
-
       const praises = [
-        '참 잘했어요!',
-        '우리 윤슬이 최고!',
-        '멋쟁이 윤슬이!',
-        '아주 잘했어요!'
+        '정답이에요! 참 잘했어요!',
+        '우와! 우리 윤슬이 최고!',
+        '맞았어요! 멋쟁이 윤슬이!',
+        '딩동댕! 아주 잘했어요!'
       ];
       const celebrationVoice = praises[Math.floor(Math.random() * praises.length)];
       const emojis = ['🌟', '💖', '🎉', '👏', '🥳', '🎈'];
       const chosenEmoji = emojis[Math.floor(Math.random() * emojis.length)];
 
-      // 화면에 표시되는 글자
-      const displayedText = `${word}! ${celebrationVoice}`;
       document.getElementById('celebrationEmoji').innerText = chosenEmoji;
-      document.getElementById('celebrationText').innerText = displayedText;
+      document.getElementById('celebrationText').innerText = celebrationVoice;
       document.getElementById('celebrationOverlay').style.display = 'flex';
 
-      // 칭찬 화면 글자를 아이 목소리로 읽어주기!
-      speakText(displayedText);
+      speakText(`${word}! ${celebrationVoice}`);
 
       setTimeout(() => {
         callback();
-      }, 2300);
+      }, 1800);
     }
 
     function updateStars() {
